@@ -25,10 +25,10 @@ MVP 0.3
 - Robust timeouts, retries, backoff for transient errors (basic retry/backoff implemented)
 
 Sessions/QA (Phase 2)
-- Scripts: ai-session (tmux wrapper) new|list|logs|kill
-- Scripts: ai-watch (watchexec/entr wrapper)
-- CLI: status snapshot (sessions, diffs) → ai-status (JSON: sessions, watchers, git diff --stat)
-- Script: ai-tree (project snapshot; text/JSON)
+- Scripts: ai-session (tmux wrapper) new|list|logs|kill (basic; requires tmux)
+- Scripts: ai-watch (watchexec/entr wrapper) (basic)
+- CLI: status snapshot (sessions, diffs) → ai-status (JSON: sessions, watchers, git diff --stat) (basic)
+- Script: ai-tree (project snapshot; text/JSON) (done)
 - ai-session kill: graceful SIGINT → SIGTERM after timeout
 
 Operational

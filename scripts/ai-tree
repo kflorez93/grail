@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+max_depth=3
+json=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --max-depth)
+      max_depth="${2:-3}"; shift 2 || true ;;
+    --json)
+      json=1; shift || true ;;
+    *) shift || true ;;
+  esac
+done
+
+if [[ "$json" -eq 1 ]]; then
+  # simple JSON array of paths up to max_depth
+  find . -maxdepth "$max_depth" -print | sed 's/^\.\///' | python3 -c 'import json,sys; print(json.dumps([l.strip() for l in sys.stdin if l.strip()], indent=2))'
+else
+  find . -maxdepth "$max_depth" -print | sed 's/^\.\///'
+fi

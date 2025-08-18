@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Sessions
+if command -v tmux >/dev/null 2>&1 && tmux list-sessions >/dev/null 2>&1; then
+  sessions=$(tmux list-sessions -F '#S' | awk '{print "\""$0"\""}' | paste -sd, -)
+  sessions_json="[${sessions}]"
+else
+  sessions_json="[]"
+fi
+
+# Watchers not tracked yet; placeholder
+watchers_json="[]"
+
+# Git diff stat
+if command -v git >/dev/null 2>&1; then
+  diff_stat=$(git diff --stat || true)
+else
+  diff_stat=""
+fi
+
+printf '{"sessions":%s,"watchers":%s,"git_diff_stat":%s}\n' "$sessions_json" "$watchers_json" "$(printf "%s" "$diff_stat" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))' 2>/dev/null || node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>console.log(JSON.stringify(d)))')"

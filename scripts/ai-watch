@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+dir="${1:-}"; shift || true
+cmd="${1:-}"; shift || true
+
+if [[ -z "$dir" || -z "$cmd" ]]; then
+  echo '{"error":"usage: ai-watch <dir> "\"<cmd>\"""}'
+  exit 2
+fi
+
+if command -v watchexec >/dev/null 2>&1; then
+  watchexec -w "$dir" --shell=sh -- "$cmd"
+  exit $?
+fi
+
+if command -v entr >/dev/null 2>&1; then
+  while true; do
+    find "$dir" -type f | entr -d sh -c "$cmd" || true
+    sleep 0.2
+  done
+  exit 0
+fi
+
+echo '{"error":"no watcher found (install watchexec or entr)"}'
+exit 1

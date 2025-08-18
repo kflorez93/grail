@@ -3,6 +3,18 @@ Docudex (placeholder name)
 Minimal scaffold: daemon exposes /health; CLI checks it.
 
 Usage
+- Sessions & QA scripts:
+
+```
+./scripts/ai-session list
+./scripts/ai-session new server "pnpm dev"
+./scripts/ai-session logs server 200
+./scripts/ai-session kill server
+
+./scripts/ai-watch src "pytest -q"
+./scripts/ai-status
+./scripts/ai-tree --max-depth 3 --json
+```
 
 - Start daemon:
 
