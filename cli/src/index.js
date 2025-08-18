@@ -398,6 +398,15 @@ function request(method, path, body) {
       }
     };
 
+    // Migrate legacy cache dir to .grail-cache if present
+    try {
+      const legacy = path.resolve(process.cwd(), ".docudex-cache");
+      const next = path.resolve(process.cwd(), ".grail-cache");
+      if (fs.existsSync(legacy) && !fs.existsSync(next)) {
+        fs.renameSync(legacy, next);
+      }
+    } catch (_) {}
+
     // Write onboarding guide
     const md = `# Grail Init\n\nGrail is a CLI-first research & QA toolkit for terminal AIs.\n\n## Quick start\n\n- Start daemon in a long-lived shell:\n\n\`node ./daemon/src/index.js\`\n\n- Health:\n\n\`grail health --pretty\`\n\n- Docs bundle (example):\n\n\`grail docs \"nextjs static generation\" --site vercel.com --n 3 --pretty\`\n\n- Sessions & QA:\n\n\`./scripts/ai-session new server \"pnpm dev\"\`\n\n\`./scripts/ai-watch src \"pytest -q\"\`\n\n\`./scripts/ai-status\`\n\n## Environment\n\n- Playwright: ${hasPlaywright ? "installed" : "missing"}\n- tmux: ${hasTmux ? "installed" : "missing"}\n- watcher (watchexec/entr): ${hasWatchexec || hasEntr ? "available" : "missing"}\n- search provider: ${provider} (${providerReady ? "ready" : "not configured"})\n\n## Commands\n\n${manifest.commands.map(c=>`- ${c.name}: ${c.desc||""}`).join("\n")}\n\n## Files\n\n- This guide: GRAIL_INIT.md\n- Manifest: grail.manifest.json\n`;
     fs.writeFileSync("GRAIL_INIT.md", md, "utf8");

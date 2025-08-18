@@ -1,0 +1,94 @@
+{
+  "name": "grail",
+  "version": "0.1.0",
+  "description": "Grail: research & QA toolkit for terminal AIs",
+  "commands": [
+    {
+      "name": "health",
+      "outputs": "JSON",
+      "desc": "Daemon health"
+    },
+    {
+      "name": "render",
+      "args": [
+        "url",
+        "outDir?"
+      ],
+      "flags": [
+        "wait-strategy",
+        "wait-selector",
+        "wait-ms",
+        "pretty"
+      ],
+      "outputs": "JSON"
+    },
+    {
+      "name": "extract",
+      "args": [
+        "file|url",
+        "outDir?"
+      ],
+      "flags": [
+        "wait-strategy",
+        "wait-selector",
+        "wait-ms",
+        "pretty"
+      ],
+      "outputs": "JSON"
+    },
+    {
+      "name": "search",
+      "args": [
+        "query"
+      ],
+      "flags": [
+        "site",
+        "n"
+      ],
+      "outputs": "JSONL"
+    },
+    {
+      "name": "pick",
+      "args": [
+        "query"
+      ],
+      "flags": [
+        "site",
+        "n"
+      ],
+      "outputs": "JSONL"
+    },
+    {
+      "name": "docs",
+      "args": [
+        "topic"
+      ],
+      "flags": [
+        "site",
+        "n",
+        "pretty"
+      ],
+      "outputs": "JSON"
+    },
+    {
+      "name": "doctor",
+      "outputs": "JSON",
+      "desc": "Environment check"
+    },
+    {
+      "name": "init",
+      "outputs": "files+JSON",
+      "desc": "Generate onboarding guide in project"
+    }
+  ],
+  "env": {
+    "GRAIL_CACHE_DIR": ".grail-cache (default)",
+    "GRAIL_MAX_PARALLEL": "4 (default)",
+    "GRAIL_RPS": "4 (default)",
+    "GRAIL_CACHE_MAX_RUNS": "100 (default)",
+    "GRAIL_DISABLE_BROWSER": "unset by default",
+    "GRAIL_SEARCH_PROVIDER": "ddg|google",
+    "GRAIL_GOOGLE_API_KEY": "required if provider=google",
+    "GRAIL_GOOGLE_CX": "required if provider=google"
+  }
+}

@@ -19,7 +19,7 @@ else
 fi
 
 # Watchers from registry
-CACHE_DIR="${DOCUDEX_CACHE_DIR:-.docudex-cache}"
+CACHE_DIR="${GRAIL_CACHE_DIR:-.grail-cache}"
 REG_DIR="$CACHE_DIR/watchers"
 if [[ -d "$REG_DIR" ]]; then
   watchers_json=$(ls -1 "$REG_DIR" 2>/dev/null | sed 's#^#'"$REG_DIR"'/#' | xargs -I{} sh -c 'cat "{}"' 2>/dev/null | paste -sd, - | sed 's/^/[/' | sed 's/$/]/')

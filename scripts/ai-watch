@@ -9,7 +9,7 @@ if [[ -z "$dir" || -z "$cmd" ]]; then
   exit 2
 fi
 
-CACHE_DIR="${DOCUDEX_CACHE_DIR:-.docudex-cache}"
+CACHE_DIR="${GRAIL_CACHE_DIR:-.grail-cache}"
 REG_DIR="$CACHE_DIR/watchers"
 mkdir -p "$REG_DIR"
 ID="$$"
