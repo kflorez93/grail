@@ -9,8 +9,15 @@ else
   sessions_json="[]"
 fi
 
-# Watchers not tracked yet; placeholder
-watchers_json="[]"
+# Watchers from registry
+CACHE_DIR="${DOCUDEX_CACHE_DIR:-.docudex-cache}"
+REG_DIR="$CACHE_DIR/watchers"
+if [[ -d "$REG_DIR" ]]; then
+  watchers_json=$(ls -1 "$REG_DIR" 2>/dev/null | sed 's#^#'"$REG_DIR"'/#' | xargs -I{} sh -c 'cat "{}"' 2>/dev/null | paste -sd, - | sed 's/^/[/' | sed 's/$/]/')
+  if [[ -z "$watchers_json" || "$watchers_json" = "[]" ]]; then watchers_json="[]"; fi
+else
+  watchers_json="[]"
+fi
 
 # Git diff stat
 if command -v git >/dev/null 2>&1; then

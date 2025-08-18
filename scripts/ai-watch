@@ -9,8 +9,37 @@ if [[ -z "$dir" || -z "$cmd" ]]; then
   exit 2
 fi
 
+CACHE_DIR="${DOCUDEX_CACHE_DIR:-.docudex-cache}"
+REG_DIR="$CACHE_DIR/watchers"
+mkdir -p "$REG_DIR"
+ID="$$"
+REG_FILE="$REG_DIR/$ID.json"
+STARTED_AT="$(date -Iseconds)"
+
+register() {
+  cat > "$REG_FILE" <<JSON
+{
+  "id": "$ID",
+  "dir": "$(pwd)/$dir",
+  "cmd": "$cmd",
+  "pid": $ID,
+  "tool": "auto",
+  "started_at": "$STARTED_AT",
+  "status": "running"
+}
+JSON
+}
+
+cleanup() {
+  rm -f "$REG_FILE" || true
+}
+
+trap cleanup EXIT INT TERM
+register
+
 if command -v watchexec >/dev/null 2>&1; then
-  watchexec -w "$dir" --shell=sh -- "$cmd"
+  # shellcheck disable=SC2068
+  watchexec -w "$dir" --shell=sh -- $cmd
   exit $?
 fi
 

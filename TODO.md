@@ -27,7 +27,7 @@ MVP 0.3
 Sessions/QA (Phase 2)
 - Scripts: ai-session (tmux wrapper) new|list|logs|kill (basic; requires tmux)
 - Scripts: ai-watch (watchexec/entr wrapper) (basic)
-- CLI: status snapshot (sessions, diffs) → ai-status (JSON: sessions, watchers, git diff --stat) (basic)
+- CLI: status snapshot (sessions, diffs) → ai-status (JSON: sessions, watchers, git diff --stat) (basic; reads `.docudex-cache/watchers`)
 - Script: ai-tree (project snapshot; text/JSON) (done)
 - ai-session kill: graceful SIGINT → SIGTERM after timeout
 

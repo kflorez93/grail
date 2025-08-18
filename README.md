@@ -16,6 +16,8 @@ Usage
 ./scripts/ai-tree --max-depth 3 --json
 ```
 
+Watchers are registered under `.docudex-cache/watchers/*.json` and reported by `ai-status`.
+
 - Start daemon:
 
 ```
