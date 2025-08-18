@@ -90,12 +90,12 @@ function parseDuckDuckGoHtml(html, limit) {
 }
 
 async function providerSearch(query, site, n) {
-  const provider = process.env.DOCUDEX_SEARCH_PROVIDER || "ddg";
-  if (provider === "google" && process.env.DOCUDEX_GOOGLE_API_KEY && process.env.DOCUDEX_GOOGLE_CX) {
+  const provider = process.env.GRAIL_SEARCH_PROVIDER || "ddg";
+  if (provider === "google" && process.env.GRAIL_GOOGLE_API_KEY && process.env.GRAIL_GOOGLE_CX) {
     try {
       const params = new URLSearchParams({
-        key: process.env.DOCUDEX_GOOGLE_API_KEY,
-        cx: process.env.DOCUDEX_GOOGLE_CX,
+        key: process.env.GRAIL_GOOGLE_API_KEY,
+        cx: process.env.GRAIL_GOOGLE_CX,
         q: site ? `site:${site} ${query}` : query,
         num: String(Math.min(10, Math.max(1, n)))
       });
@@ -170,7 +170,7 @@ function request(method, path, body) {
 (async () => {
   if (cmd === "health") {
     if (["--help", "-h"].includes(process.argv[3] || "")) {
-      console.log("Usage: docudex health [--json|--pretty]");
+      console.log("Usage: grail health [--json|--pretty]");
       process.exit(0);
     }
     try {
@@ -185,12 +185,12 @@ function request(method, path, body) {
   } else if (cmd === "render") {
     const { args, flags } = parseFlags(process.argv.slice(3));
     if (flags.h || flags.help) {
-      console.log("Usage: docudex render <url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
+      console.log("Usage: grail render <url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
       process.exit(0);
     }
     const url = args[0];
     if (!url) {
-      console.error("Usage: docudex render <url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
+      console.error("Usage: grail render <url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
       process.exit(2);
     }
     const outDir = args[1] || flags.outDir || "";
@@ -211,12 +211,12 @@ function request(method, path, body) {
   } else if (cmd === "extract") {
     const { args, flags } = parseFlags(process.argv.slice(3));
     if (flags.h || flags.help) {
-      console.log("Usage: docudex extract <file|url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
+      console.log("Usage: grail extract <file|url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
       process.exit(0);
     }
     const input = args[0];
     if (!input) {
-      console.error("Usage: docudex extract <file|url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
+      console.error("Usage: grail extract <file|url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
       process.exit(2);
     }
     const outDir = args[1] || flags.outDir || "";
@@ -246,12 +246,12 @@ function request(method, path, body) {
   } else if (cmd === "search") {
     const { args, flags } = parseFlags(process.argv.slice(3));
     if (flags.h || flags.help) {
-      console.log("Usage: docudex search <query> [--site <domain>] [--n <int>]");
+      console.log("Usage: grail search <query> [--site <domain>] [--n <int>]");
       process.exit(0);
     }
     const query = args.join(" ");
     if (!query) {
-      console.error("Usage: docudex search <query> [--site <domain>] [--n <int>]");
+      console.error("Usage: grail search <query> [--site <domain>] [--n <int>]");
       process.exit(2);
     }
     const site = flags.site ? String(flags.site) : undefined;
@@ -262,12 +262,12 @@ function request(method, path, body) {
   } else if (cmd === "pick") {
     const { args, flags } = parseFlags(process.argv.slice(3));
     if (flags.h || flags.help) {
-      console.log("Usage: docudex pick <query> --prefer official [--site <domain>] [--n <int>]");
+      console.log("Usage: grail pick <query> --prefer official [--site <domain>] [--n <int>]");
       process.exit(0);
     }
     const query = args.join(" ");
     if (!query) {
-      console.error("Usage: docudex pick <query> --prefer official [--site <domain>] [--n <int>]");
+      console.error("Usage: grail pick <query> --prefer official [--site <domain>] [--n <int>]");
       process.exit(2);
     }
     const site = flags.site ? String(flags.site) : undefined;
@@ -283,12 +283,12 @@ function request(method, path, body) {
   } else if (cmd === "docs") {
     const { args, flags } = parseFlags(process.argv.slice(3));
     if (flags.h || flags.help) {
-      console.log("Usage: docudex docs <topic> --site <domain> [--path <path>] [--n <int>] [--json|--pretty]");
+      console.log("Usage: grail docs <topic> --site <domain> [--path <path>] [--n <int>] [--json|--pretty]");
       process.exit(0);
     }
     const topic = args.join(" ");
     if (!topic) {
-      console.error("Usage: docudex docs <topic> --site <domain> [--path <path>] [--n <int>] [--json|--pretty]");
+      console.error("Usage: grail docs <topic> --site <domain> [--path <path>] [--n <int>] [--json|--pretty]");
       process.exit(2);
     }
     const site = flags.site ? String(flags.site) : undefined;
@@ -308,7 +308,7 @@ function request(method, path, body) {
     const batchPayload = { urls, parallel: flags.parallel ? Number(flags.parallel) : undefined, outDir, wait: Object.keys(wait).length ? wait : undefined };
     const res = await request("POST", "/batch", batchPayload);
     // Write bundle.json
-    const baseCache = process.env.DOCUDEX_CACHE_DIR || ".docudex-cache";
+    const baseCache = process.env.GRAIL_CACHE_DIR || ".grail-cache";
     const runDir = ensureRunDir(baseCache, "docs");
     const bundlePath = path.join(runDir, "bundle.json");
     const bundle = {
@@ -359,14 +359,14 @@ function request(method, path, body) {
     console.log(VERSION);
     process.exit(0);
   } else if (cmd === "help" || cmd === "--help" || cmd === "-h") {
-    const help = `docudex ${VERSION}\n\nCommands:\n  health [--pretty]\n  render <url> [outDir] [--wait-...]\n  extract <file|url> [outDir] [--wait-...]\n  search <query> [--site <domain>] [--n <int>]\n  pick <query> --prefer official [--site <domain>] [--n <int>]\n  docs <topic> --site <domain> [--n <int>] [--pretty]\n  version\n  help\n`;
+    const help = `grail ${VERSION}\n\nCommands:\n  health [--pretty]\n  render <url> [outDir] [--wait-...]\n  extract <file|url> [outDir] [--wait-...]\n  search <query> [--site <domain>] [--n <int>]\n  pick <query> --prefer official [--site <domain>] [--n <int>]\n  docs <topic> --site <domain> [--n <int>] [--pretty]\n  doctor [--pretty]\n  version\n  help\n`;
     console.log(help);
     process.exit(0);
   } else if (cmd === "manifest") {
     const manifest = {
-      name: "docudex",
+      name: "grail",
       version: VERSION,
-      description: "CLI-first research & QA toolkit for terminal AIs",
+      description: "Grail: research & QA toolkit for terminal AIs",
       commands: [
         { name: "health", outputs: "JSON", desc: "Daemon health" },
         { name: "render", args: ["url", "outDir?"], flags: ["wait-strategy", "wait-selector", "wait-ms", "pretty"], outputs: "JSON" },
@@ -394,16 +394,16 @@ function request(method, path, body) {
         status: { sessions: "array", watchers: "array", git_diff_stat: "string" }
       },
       examples: [
-        "docudex health --pretty",
-        "docudex search 'nextjs static generation' --site vercel.com",
-        "docudex pick 'nextjs static generation' --site vercel.com --n 3",
-        "docudex docs 'nextjs static generation' --site vercel.com --n 3 --pretty"
+        "grail health --pretty",
+        "grail search 'nextjs static generation' --site vercel.com",
+        "grail pick 'nextjs static generation' --site vercel.com --n 3",
+        "grail docs 'nextjs static generation' --site vercel.com --n 3 --pretty"
       ]
     };
     console.log(JSON.stringify(manifest, null, 2));
     process.exit(0);
   } else {
-    console.error("Usage: docudex health [--json|--pretty] | docudex render <url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty] | docudex extract <file|url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty] | docudex search <query> [--site <domain>] [--n <int>] | docudex pick <query> --prefer official [--site <domain>] | docudex docs <topic> --site <domain> [--path <path>] [--n <int>] [--json|--pretty]");
+    console.error("Usage: grail health [--json|--pretty] | grail render <url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty] | grail extract <file|url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty] | grail search <query> [--site <domain>] [--n <int>] | grail pick <query> --prefer official [--site <domain>] | grail docs <topic> --site <domain> [--path <path>] [--n <int>] [--json|--pretty]");
     process.exit(2);
   }
 })();

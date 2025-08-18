@@ -1,4 +1,4 @@
-Docudex (placeholder name)
+Grail
 
 Minimal scaffold: daemon exposes /health; CLI checks it.
 
@@ -41,7 +41,7 @@ node ./cli/src/index.js doctor --pretty
 - Render a URL (writes final.html and page.png to cache dir):
 
 ```
-node ./cli/src/index.js render "https://example.com" .docudex-cache --wait-strategy networkidle --pretty
+node ./cli/src/index.js render "https://example.com" .grail-cache --wait-strategy networkidle --pretty
 ```
 
 - Extract from a local HTML file or fetch-and-extract from a URL:
@@ -62,13 +62,13 @@ node ./cli/src/index.js docs "nextjs static generation" --site vercel.com --n 3 
 Environment
 
 - `PORT`: daemon port (default 8787)
-- `DOCUDEX_CACHE_DIR`: base cache directory (default `.docudex-cache`)
-- `DOCUDEX_MAX_PARALLEL`: concurrent operations (default 4)
-- `DOCUDEX_RPS`: requests per second rate limit (default 4)
-- `DOCUDEX_CACHE_MAX_RUNS`: max run directories to keep in cache (default 100)
-- `DOCUDEX_DISABLE_BROWSER`: set to `1` to disable Playwright usage
-- `DOCUDEX_SEARCH_PROVIDER`: `ddg` (default) or `google`
-- `DOCUDEX_GOOGLE_API_KEY` and `DOCUDEX_GOOGLE_CX`: set both to enable Google Custom Search provider
+- `GRAIL_CACHE_DIR`: base cache directory (default `.grail-cache`)
+- `GRAIL_MAX_PARALLEL`: concurrent operations (default 4)
+- `GRAIL_RPS`: requests per second rate limit (default 4)
+- `GRAIL_CACHE_MAX_RUNS`: max run directories to keep in cache (default 100)
+- `GRAIL_DISABLE_BROWSER`: set to `1` to disable Playwright usage
+- `GRAIL_SEARCH_PROVIDER`: `ddg` (default) or `google`
+- `GRAIL_GOOGLE_API_KEY` and `GRAIL_GOOGLE_CX`: set both to enable Google Custom Search provider
 
 Install Playwright to enable browser rendering:
 

@@ -1,0 +1,1922 @@
+{
+  "title": "Next.js on Vercel",
+  "canonical": "https://vercel.com/docs/frameworks/full-stack/nextjs",
+  "headings": [],
+  "links": [
+    {
+      "href": "/docs/getting-started-with-vercel",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/getting-started-with-vercel/projects-deployments",
+      "text": "Projects and Deployments"
+    },
+    {
+      "href": "/docs/getting-started-with-vercel/template",
+      "text": "Use a Template"
+    },
+    {
+      "href": "/docs/getting-started-with-vercel/import",
+      "text": "Import Existing Project"
+    },
+    {
+      "href": "/docs/getting-started-with-vercel/domains",
+      "text": "Add a Domain"
+    },
+    {
+      "href": "/docs/getting-started-with-vercel/buy-domain",
+      "text": "Buy a Domain"
+    },
+    {
+      "href": "/docs/getting-started-with-vercel/use-existing",
+      "text": "Transfer an Existing Domain"
+    },
+    {
+      "href": "/docs/getting-started-with-vercel/collaborate",
+      "text": "Collaborate"
+    },
+    {
+      "href": "/docs/getting-started-with-vercel/next-steps",
+      "text": "Next Steps"
+    },
+    {
+      "href": "/docs/frameworks",
+      "text": "Supported Frameworks"
+    },
+    {
+      "href": "/docs/frameworks/full-stack",
+      "text": "Full-stack"
+    },
+    {
+      "href": "/docs/frameworks/full-stack/nextjs",
+      "text": "Next.js"
+    },
+    {
+      "href": "/docs/frameworks/full-stack/sveltekit",
+      "text": "SvelteKit"
+    },
+    {
+      "href": "/docs/frameworks/full-stack/nuxt",
+      "text": "Nuxt"
+    },
+    {
+      "href": "/docs/frameworks/full-stack/remix",
+      "text": "Remix"
+    },
+    {
+      "href": "/docs/frameworks/frontend",
+      "text": "Frontends"
+    },
+    {
+      "href": "/docs/frameworks/frontend/astro",
+      "text": "Astro"
+    },
+    {
+      "href": "/docs/frameworks/frontend/vite",
+      "text": "Vite"
+    },
+    {
+      "href": "/docs/frameworks/frontend/react-router",
+      "text": "React Router"
+    },
+    {
+      "href": "/docs/frameworks/frontend/gatsby",
+      "text": "Gatsby"
+    },
+    {
+      "href": "/docs/frameworks/frontend/create-react-app",
+      "text": "Create React App"
+    },
+    {
+      "href": "/docs/frameworks/backend",
+      "text": "Backends"
+    },
+    {
+      "href": "/docs/frameworks/backend/nitro",
+      "text": "Nitro"
+    },
+    {
+      "href": "/docs/frameworks/backend/hono",
+      "text": "Hono"
+    },
+    {
+      "href": "/docs/frameworks/more-frameworks",
+      "text": "All Frameworks"
+    },
+    {
+      "href": "/docs/incremental-migration",
+      "text": "Incremental Migration"
+    },
+    {
+      "href": "/docs/production-checklist",
+      "text": "Production Checklist"
+    },
+    {
+      "href": "/guides",
+      "text": "Guides"
+    },
+    {
+      "href": "/docs/accounts",
+      "text": "Account Management"
+    },
+    {
+      "href": "/docs/activity-log",
+      "text": "Activity Log"
+    },
+    {
+      "href": "/docs/deployment-protection",
+      "text": "Deployment Protection"
+    },
+    {
+      "href": "/docs/deployment-protection/methods-to-bypass-deployment-protection",
+      "text": "Bypass Deployment Protection"
+    },
+    {
+      "href": "/docs/deployment-protection/methods-to-bypass-deployment-protection/deployment-protection-exceptions",
+      "text": "Exceptions"
+    },
+    {
+      "href": "/docs/deployment-protection/methods-to-bypass-deployment-protection/options-allowlist",
+      "text": "OPTIONS Allowlist"
+    },
+    {
+      "href": "/docs/deployment-protection/methods-to-bypass-deployment-protection/protection-bypass-automation",
+      "text": "Protection Bypass for Automation"
+    },
+    {
+      "href": "/docs/deployment-protection/methods-to-bypass-deployment-protection/sharable-links",
+      "text": "Sharable Links"
+    },
+    {
+      "href": "/docs/deployment-protection/methods-to-protect-deployments",
+      "text": "Protect Deployments"
+    },
+    {
+      "href": "/docs/deployment-protection/methods-to-protect-deployments/password-protection",
+      "text": "Password Protection"
+    },
+    {
+      "href": "/docs/deployment-protection/methods-to-protect-deployments/trusted-ips",
+      "text": "Trusted IPs"
+    },
+    {
+      "href": "/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication",
+      "text": "Vercel Authentication"
+    },
+    {
+      "href": "/docs/directory-sync",
+      "text": "Directory Sync"
+    },
+    {
+      "href": "/docs/saml",
+      "text": "SAML SSO"
+    },
+    {
+      "href": "/docs/two-factor-authentication",
+      "text": "Two-factor (2FA)"
+    },
+    {
+      "href": "/docs/v0",
+      "text": "v0"
+    },
+    {
+      "href": "/docs/ai-sdk",
+      "text": "AI SDK"
+    },
+    {
+      "href": "/docs/agents",
+      "text": "Agents"
+    },
+    {
+      "href": "/docs/ai-gateway",
+      "text": "AI Gatewaybeta"
+    },
+    {
+      "href": "/docs/ai-gateway/models-and-providers",
+      "text": "Models & Providers"
+    },
+    {
+      "href": "/docs/ai-gateway/observability",
+      "text": "Observability"
+    },
+    {
+      "href": "/docs/ai-gateway/pricing",
+      "text": "Pricing"
+    },
+    {
+      "href": "/docs/ai-gateway/provider-options",
+      "text": "Provider Options"
+    },
+    {
+      "href": "/docs/ai-gateway/openai-compat",
+      "text": "OpenAI-Compatible API"
+    },
+    {
+      "href": "/docs/ai-gateway/authentication",
+      "text": "Authentication"
+    },
+    {
+      "href": "/docs/ai-gateway/byok",
+      "text": "BYOK"
+    },
+    {
+      "href": "/docs/ai-gateway/community-frameworks",
+      "text": "Community Frameworks"
+    },
+    {
+      "href": "/docs/ai-gateway/community-frameworks/langchain",
+      "text": "LangChain"
+    },
+    {
+      "href": "/docs/ai-gateway/community-frameworks/mastra",
+      "text": "Mastra"
+    },
+    {
+      "href": "/docs/ai-gateway/app-attribution",
+      "text": "App Attribution"
+    },
+    {
+      "href": "/docs/ai-gateway/model-variants",
+      "text": "Model Variants"
+    },
+    {
+      "href": "/docs/mcp",
+      "text": "MCP"
+    },
+    {
+      "href": "/docs/mcp/deploy-mcp-servers-to-vercel",
+      "text": "Deploy MCP servers"
+    },
+    {
+      "href": "/docs/mcp/vercel-mcp",
+      "text": "Vercel MCP serverbeta"
+    },
+    {
+      "href": "/docs/mcp/vercel-mcp/tools",
+      "text": "Tools"
+    },
+    {
+      "href": "/docs/ai",
+      "text": "Integrations"
+    },
+    {
+      "href": "/docs/ai/adding-a-provider",
+      "text": "Adding a Provider"
+    },
+    {
+      "href": "/docs/ai/adding-a-model",
+      "text": "Adding a Model"
+    },
+    {
+      "href": "/docs/ai/xai",
+      "text": "xAI"
+    },
+    {
+      "href": "/docs/ai/groq",
+      "text": "Groq"
+    },
+    {
+      "href": "/docs/ai/fal",
+      "text": "fal"
+    },
+    {
+      "href": "/docs/ai/deepinfra",
+      "text": "Deep Infra"
+    },
+    {
+      "href": "/docs/ai/elevenlabs",
+      "text": "ElevenLabs"
+    },
+    {
+      "href": "/docs/ai/lmnt",
+      "text": "LMNT"
+    },
+    {
+      "href": "/docs/ai/openai",
+      "text": "OpenAI"
+    },
+    {
+      "href": "/docs/ai/perplexity",
+      "text": "Perplexity"
+    },
+    {
+      "href": "/docs/ai/pinecone",
+      "text": "Pinecone"
+    },
+    {
+      "href": "/docs/ai/replicate",
+      "text": "Replicate"
+    },
+    {
+      "href": "/docs/ai/togetherai",
+      "text": "Together AI"
+    },
+    {
+      "href": "/docs/rest-api",
+      "text": "REST API"
+    },
+    {
+      "href": "/docs/sdk",
+      "text": "Vercel SDK"
+    },
+    {
+      "href": "/docs/build-output-api",
+      "text": "Build Output API"
+    },
+    {
+      "href": "/docs/build-output-api/configuration",
+      "text": "Build Output Configuration"
+    },
+    {
+      "href": "/docs/build-output-api/features",
+      "text": "Features"
+    },
+    {
+      "href": "/docs/build-output-api/primitives",
+      "text": "Vercel Primitives"
+    },
+    {
+      "href": "/docs/builds",
+      "text": "Builds"
+    },
+    {
+      "href": "/docs/builds/build-features",
+      "text": "Build Features"
+    },
+    {
+      "href": "/docs/builds/build-image",
+      "text": "Build Image"
+    },
+    {
+      "href": "/docs/builds/build-image/build-image",
+      "text": "Build Image Installed Packages"
+    },
+    {
+      "href": "/docs/builds/build-queues",
+      "text": "Build Queues"
+    },
+    {
+      "href": "/docs/builds/configure-a-build",
+      "text": "Configuring a Build"
+    },
+    {
+      "href": "/docs/builds/managing-builds",
+      "text": "Managing Builds"
+    },
+    {
+      "href": "/docs/deploy-hooks",
+      "text": "Deploy Hooks"
+    },
+    {
+      "href": "/docs/deployment-retention",
+      "text": "Deployment Retention"
+    },
+    {
+      "href": "/docs/deployments",
+      "text": "Deployments"
+    },
+    {
+      "href": "/docs/deployments/environments",
+      "text": "Environments"
+    },
+    {
+      "href": "/docs/deployments/generated-urls",
+      "text": "Generated URLs"
+    },
+    {
+      "href": "/docs/deployments/managing-deployments",
+      "text": "Managing Deployments"
+    },
+    {
+      "href": "/docs/deployments/promoting-a-deployment",
+      "text": "Promoting Deployments"
+    },
+    {
+      "href": "/docs/deployments/troubleshoot-a-build",
+      "text": "Troubleshoot Build Errors"
+    },
+    {
+      "href": "/docs/deployments/logs",
+      "text": "Accessing Build Logs"
+    },
+    {
+      "href": "/docs/deployments/claim-deployments",
+      "text": "Claim Deployments"
+    },
+    {
+      "href": "/docs/deployments/og-preview",
+      "text": "Inspect OG Metadata"
+    },
+    {
+      "href": "/docs/deployments/preview-deployment-suffix",
+      "text": "Preview Deployment Suffix"
+    },
+    {
+      "href": "/docs/deployments/sharing-deployments",
+      "text": "Sharing a Preview Deployment"
+    },
+    {
+      "href": "/docs/environment-variables",
+      "text": "Environment Variables"
+    },
+    {
+      "href": "/docs/environment-variables/framework-environment-variables",
+      "text": "Framework Environment Variables"
+    },
+    {
+      "href": "/docs/environment-variables/managing-environment-variables",
+      "text": "Managing Environment Variables"
+    },
+    {
+      "href": "/docs/environment-variables/reserved-environment-variables",
+      "text": "Reserved Environment Variables"
+    },
+    {
+      "href": "/docs/environment-variables/sensitive-environment-variables",
+      "text": "Sensitive Environment Variables"
+    },
+    {
+      "href": "/docs/environment-variables/shared-environment-variables",
+      "text": "Shared Environment Variables"
+    },
+    {
+      "href": "/docs/environment-variables/system-environment-variables",
+      "text": "System Environment Variables"
+    },
+    {
+      "href": "/docs/git",
+      "text": "Git Integrations"
+    },
+    {
+      "href": "/docs/git/vercel-for-github",
+      "text": "GitHub"
+    },
+    {
+      "href": "/docs/git/vercel-for-azure-pipelines",
+      "text": "Azure DevOps"
+    },
+    {
+      "href": "/docs/git/vercel-for-bitbucket",
+      "text": "Bitbucket"
+    },
+    {
+      "href": "/docs/git/vercel-for-gitlab",
+      "text": "GitLab"
+    },
+    {
+      "href": "/docs/instant-rollback",
+      "text": "Instant Rollback"
+    },
+    {
+      "href": "/docs/microfrontends",
+      "text": "Microfrontendsbeta"
+    },
+    {
+      "href": "/docs/microfrontends/quickstart",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/microfrontends/local-development",
+      "text": "Local Development"
+    },
+    {
+      "href": "/docs/microfrontends/path-routing",
+      "text": "Path Routing"
+    },
+    {
+      "href": "/docs/microfrontends/managing-microfrontends",
+      "text": "Managing Microfrontends"
+    },
+    {
+      "href": "/docs/microfrontends/managing-microfrontends/security",
+      "text": "Security"
+    },
+    {
+      "href": "/docs/microfrontends/managing-microfrontends/vercel-toolbar",
+      "text": "Using Vercel Toolbar"
+    },
+    {
+      "href": "/docs/microfrontends/troubleshooting",
+      "text": "Testing & Troubleshooting"
+    },
+    {
+      "href": "/docs/monorepos",
+      "text": "Monorepos"
+    },
+    {
+      "href": "/docs/monorepos/turborepo",
+      "text": "Turborepo"
+    },
+    {
+      "href": "/docs/monorepos/remote-caching",
+      "text": "Remote Caching"
+    },
+    {
+      "href": "/docs/monorepos/nx",
+      "text": "Nx"
+    },
+    {
+      "href": "/docs/monorepos/monorepo-faq",
+      "text": "Monorepos FAQ"
+    },
+    {
+      "href": "/docs/package-managers",
+      "text": "Package Managers"
+    },
+    {
+      "href": "/docs/protected-git-scopes",
+      "text": "Protected Git Scopes"
+    },
+    {
+      "href": "/docs/rolling-releases",
+      "text": "Rolling Releases"
+    },
+    {
+      "href": "/docs/skew-protection",
+      "text": "Skew Protection"
+    },
+    {
+      "href": "/docs/webhooks",
+      "text": "Webhooks"
+    },
+    {
+      "href": "/docs/webhooks/webhooks-api",
+      "text": "Webhooks API Reference"
+    },
+    {
+      "href": "/docs/domains",
+      "text": "Domains"
+    },
+    {
+      "href": "/docs/domains/working-with-domains",
+      "text": "Working with Domains"
+    },
+    {
+      "href": "/docs/domains/working-with-domains/add-a-domain",
+      "text": "Adding a Domain"
+    },
+    {
+      "href": "/docs/domains/working-with-domains/add-a-domain-to-environment",
+      "text": "Adding a Domain to an Environment"
+    },
+    {
+      "href": "/docs/domains/working-with-domains/assign-domain-to-a-git-branch",
+      "text": "Assigning a Domain to a Git Branch"
+    },
+    {
+      "href": "/docs/domains/working-with-domains/deploying-and-redirecting",
+      "text": "Deploying & Redirecting Domains"
+    },
+    {
+      "href": "/docs/domains/working-with-domains/remove-a-domain",
+      "text": "Removing a Domain"
+    },
+    {
+      "href": "/docs/domains/working-with-domains/renew-a-domain",
+      "text": "Renewing a Domain"
+    },
+    {
+      "href": "/docs/domains/working-with-domains/transfer-your-domain",
+      "text": "Transferring Domains"
+    },
+    {
+      "href": "/docs/domains/working-with-domains/view-and-search-domains",
+      "text": "Viewing & Searching Domains"
+    },
+    {
+      "href": "/docs/domains/working-with-dns",
+      "text": "Working with DNS"
+    },
+    {
+      "href": "/docs/domains/managing-dns-records",
+      "text": "Managing DNS Records"
+    },
+    {
+      "href": "/docs/domains/working-with-nameservers",
+      "text": "Working with Nameservers"
+    },
+    {
+      "href": "/docs/domains/managing-nameservers",
+      "text": "Managing Nameservers"
+    },
+    {
+      "href": "/docs/domains/working-with-ssl",
+      "text": "Working with SSL"
+    },
+    {
+      "href": "/docs/domains/custom-SSL-certificate",
+      "text": "Custom SSL Certificates"
+    },
+    {
+      "href": "/docs/domains/pre-generating-ssl-certs",
+      "text": "Pre-Generate SSL Certificates"
+    },
+    {
+      "href": "/docs/domains/supported-domains",
+      "text": "Supported Domains"
+    },
+    {
+      "href": "/docs/domains/troubleshooting",
+      "text": "Troubleshooting Domains"
+    },
+    {
+      "href": "/docs/edge-network",
+      "text": "Edge Network"
+    },
+    {
+      "href": "/docs/edge-network/regions",
+      "text": "Regions"
+    },
+    {
+      "href": "/docs/edge-network/compression",
+      "text": "Compression"
+    },
+    {
+      "href": "/docs/edge-network/manage-usage",
+      "text": "Manage Usage"
+    },
+    {
+      "href": "/docs/encryption",
+      "text": "Encryption"
+    },
+    {
+      "href": "/docs/headers",
+      "text": "Headers"
+    },
+    {
+      "href": "/docs/headers/security-headers",
+      "text": "Security Headers"
+    },
+    {
+      "href": "/docs/headers/cache-control-headers",
+      "text": "Cache-Control Headers"
+    },
+    {
+      "href": "/docs/headers/request-headers",
+      "text": "Request Headers"
+    },
+    {
+      "href": "/docs/headers/response-headers",
+      "text": "Response Headers"
+    },
+    {
+      "href": "/docs/image-optimization",
+      "text": "Image Optimization"
+    },
+    {
+      "href": "/docs/image-optimization/quickstart",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/image-optimization/limits-and-pricing",
+      "text": "Limits and Pricing"
+    },
+    {
+      "href": "/docs/image-optimization/managing-image-optimization-costs",
+      "text": "Managing Usage & Costs"
+    },
+    {
+      "href": "/docs/image-optimization/legacy-pricing",
+      "text": "Legacy Pricing"
+    },
+    {
+      "href": "/docs/incremental-static-regeneration",
+      "text": "Incremental Static Regeneration"
+    },
+    {
+      "href": "/docs/incremental-static-regeneration/quickstart",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/incremental-static-regeneration/limits-and-pricing",
+      "text": "Usage & Pricing"
+    },
+    {
+      "href": "/docs/redirects",
+      "text": "Redirects"
+    },
+    {
+      "href": "/docs/rewrites",
+      "text": "Rewrites"
+    },
+    {
+      "href": "/docs/edge-cache",
+      "text": "Vercel Cache"
+    },
+    {
+      "href": "/docs/comments",
+      "text": "Comments"
+    },
+    {
+      "href": "/docs/comments/how-comments-work",
+      "text": "Enabling Comments"
+    },
+    {
+      "href": "/docs/comments/using-comments",
+      "text": "Using Comments"
+    },
+    {
+      "href": "/docs/comments/managing-comments",
+      "text": "Managing Comments"
+    },
+    {
+      "href": "/docs/comments/integrations",
+      "text": "Integrations"
+    },
+    {
+      "href": "/docs/draft-mode",
+      "text": "Draft Mode"
+    },
+    {
+      "href": "/docs/edit-mode",
+      "text": "Edit Mode"
+    },
+    {
+      "href": "/docs/feature-flags",
+      "text": "Feature Flags"
+    },
+    {
+      "href": "/docs/feature-flags/flags-explorer",
+      "text": "Flags Explorer"
+    },
+    {
+      "href": "/docs/feature-flags/flags-explorer/getting-started",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/feature-flags/flags-explorer/reference",
+      "text": "Reference"
+    },
+    {
+      "href": "/docs/feature-flags/flags-explorer/limits-and-pricing",
+      "text": "Pricing"
+    },
+    {
+      "href": "/docs/feature-flags/feature-flags-pattern",
+      "text": "Flags SDK"
+    },
+    {
+      "href": "/docs/feature-flags/integrate-with-runtime-logs",
+      "text": "With Runtime Logs"
+    },
+    {
+      "href": "/docs/feature-flags/integrate-vercel-platform",
+      "text": "With Vercel Platform"
+    },
+    {
+      "href": "/docs/feature-flags/integrate-with-web-analytics",
+      "text": "With Web Analytics"
+    },
+    {
+      "href": "/docs/vercel-toolbar",
+      "text": "Toolbar"
+    },
+    {
+      "href": "/docs/vercel-toolbar/in-production-and-localhost",
+      "text": "Add to Environments"
+    },
+    {
+      "href": "/docs/vercel-toolbar/in-production-and-localhost/add-to-localhost",
+      "text": "Add to Localhost"
+    },
+    {
+      "href": "/docs/vercel-toolbar/in-production-and-localhost/add-to-production",
+      "text": "Add to Production"
+    },
+    {
+      "href": "/docs/vercel-toolbar/managing-toolbar",
+      "text": "Managing Toolbar"
+    },
+    {
+      "href": "/docs/vercel-toolbar/browser-extension",
+      "text": "Browser Extensions"
+    },
+    {
+      "href": "/docs/vercel-toolbar/accessibility-audit-tool",
+      "text": "Accessibility Audit Tool"
+    },
+    {
+      "href": "/docs/vercel-toolbar/interaction-timing-tool",
+      "text": "Interaction Timing Tool"
+    },
+    {
+      "href": "/docs/vercel-toolbar/layout-shift-tool",
+      "text": "Layout Shift Tool"
+    },
+    {
+      "href": "/docs/fluid-compute",
+      "text": "Fluid Compute"
+    },
+    {
+      "href": "/docs/fluid-compute/pricing",
+      "text": "Pricing"
+    },
+    {
+      "href": "/docs/functions",
+      "text": "Functions"
+    },
+    {
+      "href": "/docs/functions/quickstart",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/functions/streaming-functions",
+      "text": "Streaming"
+    },
+    {
+      "href": "/docs/functions/runtimes",
+      "text": "Runtimes"
+    },
+    {
+      "href": "/docs/functions/runtimes/node-js",
+      "text": "Node.js"
+    },
+    {
+      "href": "/docs/functions/runtimes/node-js/advanced-node-configuration",
+      "text": "Advanced Node.js Usage"
+    },
+    {
+      "href": "/docs/functions/runtimes/node-js/node-js-versions",
+      "text": "Supported Node.js versions"
+    },
+    {
+      "href": "/docs/functions/runtimes/python",
+      "text": "Python"
+    },
+    {
+      "href": "/docs/functions/runtimes/go",
+      "text": "Go RuntimeGo"
+    },
+    {
+      "href": "/docs/functions/runtimes/ruby",
+      "text": "Ruby"
+    },
+    {
+      "href": "/docs/functions/runtimes/wasm",
+      "text": "Wasm"
+    },
+    {
+      "href": "/docs/functions/runtimes/edge",
+      "text": "Edge Runtime"
+    },
+    {
+      "href": "/docs/functions/configuring-functions",
+      "text": "Configuring Functions"
+    },
+    {
+      "href": "/docs/functions/configuring-functions/duration",
+      "text": "Duration"
+    },
+    {
+      "href": "/docs/functions/configuring-functions/memory",
+      "text": "Memory"
+    },
+    {
+      "href": "/docs/functions/configuring-functions/runtime",
+      "text": "Runtime"
+    },
+    {
+      "href": "/docs/functions/configuring-functions/region",
+      "text": "Region"
+    },
+    {
+      "href": "/docs/functions/configuring-functions/advanced-configuration",
+      "text": "Advanced Configuration"
+    },
+    {
+      "href": "/docs/functions/functions-api-reference",
+      "text": "API Reference"
+    },
+    {
+      "href": "/docs/functions/functions-api-reference/vercel-functions-package",
+      "text": "@vercel/functions"
+    },
+    {
+      "href": "/docs/functions/logs",
+      "text": "Logs"
+    },
+    {
+      "href": "/docs/functions/limitations",
+      "text": "Limits"
+    },
+    {
+      "href": "/docs/functions/concurrency-scaling",
+      "text": "Concurrency Scaling"
+    },
+    {
+      "href": "/docs/data-cache",
+      "text": "Data Cache"
+    },
+    {
+      "href": "/docs/routing-middleware",
+      "text": "Routing Middleware"
+    },
+    {
+      "href": "/docs/routing-middleware/getting-started",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/routing-middleware/api",
+      "text": "API"
+    },
+    {
+      "href": "/docs/cron-jobs",
+      "text": "Cron Jobs"
+    },
+    {
+      "href": "/docs/cron-jobs/quickstart",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/cron-jobs/manage-cron-jobs",
+      "text": "Managing Cron Jobs"
+    },
+    {
+      "href": "/docs/cron-jobs/usage-and-pricing",
+      "text": "Usage & Pricing"
+    },
+    {
+      "href": "/docs/og-image-generation",
+      "text": "OG Image Generation"
+    },
+    {
+      "href": "/docs/og-image-generation/og-image-api",
+      "text": "@vercel/og"
+    },
+    {
+      "href": "/docs/og-image-generation/examples",
+      "text": "Examples"
+    },
+    {
+      "href": "/docs/vercel-sandbox",
+      "text": "Sandbox"
+    },
+    {
+      "href": "/docs/vercel-sandbox/examples",
+      "text": "Examples"
+    },
+    {
+      "href": "/docs/vercel-sandbox/pricing",
+      "text": "Pricing and Limits"
+    },
+    {
+      "href": "/docs/multi-tenant",
+      "text": "Multi-tenant"
+    },
+    {
+      "href": "/docs/multi-tenant/domain-management",
+      "text": "Domain Management"
+    },
+    {
+      "href": "/docs/multi-tenant/limits",
+      "text": "Limits"
+    },
+    {
+      "href": "/docs/observability",
+      "text": "Overview"
+    },
+    {
+      "href": "/docs/observability/insights",
+      "text": "Insights"
+    },
+    {
+      "href": "/docs/observability/observability-plus",
+      "text": "Observability Plus"
+    },
+    {
+      "href": "/docs/logs",
+      "text": "Logs"
+    },
+    {
+      "href": "/docs/logs/runtime",
+      "text": "Runtime"
+    },
+    {
+      "href": "/docs/otel",
+      "text": "OpenTelemetry"
+    },
+    {
+      "href": "/docs/session-tracing",
+      "text": "Session Tracing"
+    },
+    {
+      "href": "/docs/query",
+      "text": "Query"
+    },
+    {
+      "href": "/docs/query/reference",
+      "text": "Query Reference"
+    },
+    {
+      "href": "/docs/query/monitoring",
+      "text": "Monitoring"
+    },
+    {
+      "href": "/docs/query/monitoring/quickstart",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/query/monitoring/monitoring-reference",
+      "text": "Monitoring Reference"
+    },
+    {
+      "href": "/docs/query/monitoring/limits-and-pricing",
+      "text": "Limits and Pricing"
+    },
+    {
+      "href": "/docs/notebooks",
+      "text": "Notebooks"
+    },
+    {
+      "href": "/docs/speed-insights",
+      "text": "Speed Insights"
+    },
+    {
+      "href": "/docs/speed-insights/quickstart",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/speed-insights/using-speed-insights",
+      "text": "Using Speed Insights"
+    },
+    {
+      "href": "/docs/speed-insights/metrics",
+      "text": "Metrics"
+    },
+    {
+      "href": "/docs/speed-insights/privacy-policy",
+      "text": "Privacy"
+    },
+    {
+      "href": "/docs/speed-insights/package",
+      "text": "@vercel/speed-insights"
+    },
+    {
+      "href": "/docs/speed-insights/limits-and-pricing",
+      "text": "Limits and Pricing"
+    },
+    {
+      "href": "/docs/speed-insights/troubleshooting",
+      "text": "Troubleshooting"
+    },
+    {
+      "href": "/docs/speed-insights/migrating-from-legacy",
+      "text": "Migrating from Legacy"
+    },
+    {
+      "href": "/docs/log-drains",
+      "text": "Log Drains"
+    },
+    {
+      "href": "/docs/log-drains/configure-log-drains",
+      "text": "Configure Log Drains"
+    },
+    {
+      "href": "/docs/log-drains/correlate-logs-and-traces",
+      "text": "Correlate Logs and Traces"
+    },
+    {
+      "href": "/docs/log-drains/log-drains-reference",
+      "text": "Log Drains Reference"
+    },
+    {
+      "href": "/docs/analytics",
+      "text": "Web Analytics"
+    },
+    {
+      "href": "/docs/analytics/quickstart",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/analytics/using-web-analytics",
+      "text": "Using Web Analytics"
+    },
+    {
+      "href": "/docs/analytics/filtering",
+      "text": "Filtering"
+    },
+    {
+      "href": "/docs/analytics/custom-events",
+      "text": "Custom Events"
+    },
+    {
+      "href": "/docs/analytics/redacting-sensitive-data",
+      "text": "Redacting Sensitive Data"
+    },
+    {
+      "href": "/docs/analytics/privacy-policy",
+      "text": "Privacy"
+    },
+    {
+      "href": "/docs/analytics/package",
+      "text": "@vercel/analytics"
+    },
+    {
+      "href": "/docs/analytics/limits-and-pricing",
+      "text": "Pricing"
+    },
+    {
+      "href": "/docs/analytics/troubleshooting",
+      "text": "Troubleshooting"
+    },
+    {
+      "href": "/docs/manage-and-optimize-observability",
+      "text": "Manage & Optimize"
+    },
+    {
+      "href": "/docs/dashboard-features",
+      "text": "Dashboard"
+    },
+    {
+      "href": "/docs/dashboard-features/overview",
+      "text": "Navigating the Dashboard"
+    },
+    {
+      "href": "/docs/dashboard-features/support-center",
+      "text": "Support Center"
+    },
+    {
+      "href": "/docs/dashboard-features/command-menu",
+      "text": "Using the Command Menu"
+    },
+    {
+      "href": "/docs/notifications",
+      "text": "Notifications"
+    },
+    {
+      "href": "/docs/projects",
+      "text": "Projects"
+    },
+    {
+      "href": "/docs/projects/managing-projects",
+      "text": "Managing projects"
+    },
+    {
+      "href": "/docs/projects/project-dashboard",
+      "text": "Project Dashboard"
+    },
+    {
+      "href": "/docs/projects/transferring-projects",
+      "text": "Transferring a project"
+    },
+    {
+      "href": "/docs/project-configuration",
+      "text": "Project Configuration"
+    },
+    {
+      "href": "/docs/project-configuration/general-settings",
+      "text": "General Settings"
+    },
+    {
+      "href": "/docs/project-configuration/project-settings",
+      "text": "Project Settings"
+    },
+    {
+      "href": "/docs/project-configuration/git-configuration",
+      "text": "Git Configuration"
+    },
+    {
+      "href": "/docs/project-configuration/git-settings",
+      "text": "Git Settings"
+    },
+    {
+      "href": "/docs/project-configuration/global-configuration",
+      "text": "Global Configuration"
+    },
+    {
+      "href": "/docs/project-configuration/security-settings",
+      "text": "Security settings"
+    },
+    {
+      "href": "/docs/product-changes",
+      "text": "Product Changes"
+    },
+    {
+      "href": "/docs/checks",
+      "text": "Checks"
+    },
+    {
+      "href": "/docs/checks/checks-api",
+      "text": "Checks API"
+    },
+    {
+      "href": "/docs/checks/creating-checks",
+      "text": "Checks Reference"
+    },
+    {
+      "href": "/docs/cli",
+      "text": "CLI"
+    },
+    {
+      "href": "/docs/cli/deploying-from-cli",
+      "text": "Deploying from CLI"
+    },
+    {
+      "href": "/docs/cli/project-linking",
+      "text": "Project Linking"
+    },
+    {
+      "href": "/docs/cli/about-telemetry",
+      "text": "Telemetry"
+    },
+    {
+      "href": "/docs/cli/global-options",
+      "text": "Global Options"
+    },
+    {
+      "href": "/docs/cli/alias",
+      "text": "vercel alias"
+    },
+    {
+      "href": "/docs/cli/bisect",
+      "text": "vercel bisect"
+    },
+    {
+      "href": "/docs/cli/blob",
+      "text": "vercel blob"
+    },
+    {
+      "href": "/docs/cli/build",
+      "text": "vercel build"
+    },
+    {
+      "href": "/docs/cli/cache",
+      "text": "vercel cache"
+    },
+    {
+      "href": "/docs/cli/certs",
+      "text": "vercel certs"
+    },
+    {
+      "href": "/docs/cli/deploy",
+      "text": "vercel deploy"
+    },
+    {
+      "href": "/docs/cli/dev",
+      "text": "vercel dev"
+    },
+    {
+      "href": "/docs/cli/dns",
+      "text": "vercel dns"
+    },
+    {
+      "href": "/docs/cli/domains",
+      "text": "vercel domains"
+    },
+    {
+      "href": "/docs/cli/env",
+      "text": "vercel env"
+    },
+    {
+      "href": "/docs/cli/git",
+      "text": "vercel git"
+    },
+    {
+      "href": "/docs/cli/help",
+      "text": "vercel help"
+    },
+    {
+      "href": "/docs/cli/init",
+      "text": "vercel init"
+    },
+    {
+      "href": "/docs/cli/inspect",
+      "text": "vercel inspect"
+    },
+    {
+      "href": "/docs/cli/install",
+      "text": "vercel install"
+    },
+    {
+      "href": "/docs/cli/integration",
+      "text": "vercel integration"
+    },
+    {
+      "href": "/docs/cli/integration-resource",
+      "text": "vercel integration-resource"
+    },
+    {
+      "href": "/docs/cli/link",
+      "text": "vercel link"
+    },
+    {
+      "href": "/docs/cli/list",
+      "text": "vercel list"
+    },
+    {
+      "href": "/docs/cli/login",
+      "text": "vercel login"
+    },
+    {
+      "href": "/docs/cli/logout",
+      "text": "vercel logout"
+    },
+    {
+      "href": "/docs/cli/logs",
+      "text": "vercel logs"
+    },
+    {
+      "href": "/docs/cli/project",
+      "text": "vercel project"
+    },
+    {
+      "href": "/docs/cli/promote",
+      "text": "vercel promote"
+    },
+    {
+      "href": "/docs/cli/pull",
+      "text": "vercel pull"
+    },
+    {
+      "href": "/docs/cli/redeploy",
+      "text": "vercel redeploy"
+    },
+    {
+      "href": "/docs/cli/remove",
+      "text": "vercel remove"
+    },
+    {
+      "href": "/docs/cli/rollback",
+      "text": "vercel rollback"
+    },
+    {
+      "href": "/docs/cli/rolling-release",
+      "text": "vercel rolling-release"
+    },
+    {
+      "href": "/docs/cli/switch",
+      "text": "vercel switch"
+    },
+    {
+      "href": "/docs/cli/teams",
+      "text": "vercel teams"
+    },
+    {
+      "href": "/docs/cli/telemetry",
+      "text": "vercel telemetry"
+    },
+    {
+      "href": "/docs/cli/whoami",
+      "text": "vercel whoami"
+    },
+    {
+      "href": "/docs/glossary",
+      "text": "Glossary"
+    },
+    {
+      "href": "/docs/integrations",
+      "text": "Integrations"
+    },
+    {
+      "href": "/docs/integrations/install-an-integration",
+      "text": "Extend Vercel"
+    },
+    {
+      "href": "/docs/integrations/install-an-integration/add-a-connectable-account",
+      "text": "Add a Connectable Account"
+    },
+    {
+      "href": "/docs/integrations/install-an-integration/product-integration",
+      "text": "Add a Native Integration"
+    },
+    {
+      "href": "/docs/integrations/install-an-integration/manage-integrations-reference",
+      "text": "Permissions and Access"
+    },
+    {
+      "href": "/docs/integrations/create-integration",
+      "text": "Integrate with Vercel"
+    },
+    {
+      "href": "/docs/integrations/create-integration/native-integration",
+      "text": "Native integration concepts"
+    },
+    {
+      "href": "/docs/integrations/create-integration/marketplace-product",
+      "text": "Create a Native Integration"
+    },
+    {
+      "href": "/docs/integrations/create-integration/deployment-integration-action",
+      "text": "Deployment integration actions"
+    },
+    {
+      "href": "/docs/integrations/create-integration/marketplace-flows",
+      "text": "Native Integration Flows"
+    },
+    {
+      "href": "/docs/integrations/create-integration/marketplace-api",
+      "text": "Native Integrations REST API"
+    },
+    {
+      "href": "/docs/integrations/create-integration/approval-checklist",
+      "text": "Integration Approval Checklist"
+    },
+    {
+      "href": "/docs/integrations/create-integration/integration-image-guidelines",
+      "text": "Integration Image Guidelines"
+    },
+    {
+      "href": "/docs/integrations/create-integration/submit-integration",
+      "text": "Requirements for listing an Integration"
+    },
+    {
+      "href": "/docs/integrations/create-integration/upgrade-integration",
+      "text": "Upgrade an Integration"
+    },
+    {
+      "href": "/docs/integrations/cms",
+      "text": "CMS Integrations"
+    },
+    {
+      "href": "/docs/integrations/cms/agility-cms",
+      "text": "Agility CMS"
+    },
+    {
+      "href": "/docs/integrations/cms/butter-cms",
+      "text": "ButterCMS"
+    },
+    {
+      "href": "/docs/integrations/cms/contentful",
+      "text": "Contentful"
+    },
+    {
+      "href": "/docs/integrations/cms/dato-cms",
+      "text": "DatoCMS"
+    },
+    {
+      "href": "/docs/integrations/cms/formspree",
+      "text": "Formspree"
+    },
+    {
+      "href": "/docs/integrations/cms/makeswift",
+      "text": "Makeswift"
+    },
+    {
+      "href": "/docs/integrations/cms/sanity",
+      "text": "Sanity"
+    },
+    {
+      "href": "/docs/integrations/cms/sitecore",
+      "text": "Sitecore"
+    },
+    {
+      "href": "/docs/integrations/ecommerce",
+      "text": "Ecommerce Integrations"
+    },
+    {
+      "href": "/docs/integrations/ecommerce/bigcommerce",
+      "text": "BigCommerce"
+    },
+    {
+      "href": "/docs/integrations/ecommerce/shopify",
+      "text": "Shopify"
+    },
+    {
+      "href": "/docs/integrations/sign-in-with-vercel",
+      "text": "Sign in with Vercel"
+    },
+    {
+      "href": "/docs/integrations/vercel-api-integrations",
+      "text": "Building Integrations with Vercel REST API"
+    },
+    {
+      "href": "/docs/integrations/external-platforms/kubernetes",
+      "text": "Kubernetes"
+    },
+    {
+      "href": "/docs/limits",
+      "text": "Limits"
+    },
+    {
+      "href": "/docs/limits/fair-use-guidelines",
+      "text": "Fair use Guidelines"
+    },
+    {
+      "href": "/docs/plans",
+      "text": "Plans"
+    },
+    {
+      "href": "/docs/plans/hobby",
+      "text": "Hobby Plan"
+    },
+    {
+      "href": "/docs/plans/pro",
+      "text": "Pro Plan"
+    },
+    {
+      "href": "/docs/plans/pro/trials",
+      "text": "Pro Plan Trial"
+    },
+    {
+      "href": "/docs/plans/pro/billing",
+      "text": "Billing FAQ"
+    },
+    {
+      "href": "/docs/plans/enterprise",
+      "text": "Enterprise Plan"
+    },
+    {
+      "href": "/docs/plans/enterprise/billing",
+      "text": "Billing FAQ"
+    },
+    {
+      "href": "/docs/pricing",
+      "text": "Pricing"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing",
+      "text": "Regional Pricing"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/cpt1",
+      "text": "Cape Town, South Africa"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/cle1",
+      "text": "Cleveland, USA"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/dxb1",
+      "text": "Dubai, UAE"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/dub1",
+      "text": "Dublin, Ireland"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/fra1",
+      "text": "Frankfurt, Germany"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/hkg1",
+      "text": "Hong Kong"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/lhr1",
+      "text": "London, UK"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/bom1",
+      "text": "Mumbai, India"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/kix1",
+      "text": "Osaka, Japan"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/cdg1",
+      "text": "Paris, France"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/pdx1",
+      "text": "Portland, USA"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/sfo1",
+      "text": "San Francisco, USA"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/gru1",
+      "text": "São Paulo, Brazil"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/icn1",
+      "text": "Seoul, South Korea"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/sin1",
+      "text": "Singapore"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/arn1",
+      "text": "Stockholm, Sweden"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/syd1",
+      "text": "Sydney, Australia"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/hnd1",
+      "text": "Tokyo, Japan"
+    },
+    {
+      "href": "/docs/pricing/regional-pricing/iad1",
+      "text": "Washington, D.C., USA"
+    },
+    {
+      "href": "/docs/pricing/manage-and-optimize-usage",
+      "text": "Manage and Optimize Usage"
+    },
+    {
+      "href": "/docs/pricing/how-does-vercel-calculate-usage-of-resources",
+      "text": "Calculating Usage of Resources"
+    },
+    {
+      "href": "/docs/pricing/understanding-my-invoice",
+      "text": "Billing & Invoices"
+    },
+    {
+      "href": "/docs/pricing/legacy",
+      "text": "Legacy Metrics"
+    },
+    {
+      "href": "/docs/spend-management",
+      "text": "Spend Management"
+    },
+    {
+      "href": "/docs/security",
+      "text": "Overview"
+    },
+    {
+      "href": "/docs/security/compliance",
+      "text": "Security & Compliance Measures"
+    },
+    {
+      "href": "/docs/security/shared-responsibility",
+      "text": "Shared Responsibility Model"
+    },
+    {
+      "href": "/docs/security/pci-dss",
+      "text": "PCI DSS iframe Integration"
+    },
+    {
+      "href": "/docs/security/reverse-proxy",
+      "text": "Reverse Proxy Servers and Vercel"
+    },
+    {
+      "href": "/docs/security/access-control",
+      "text": "Access Control"
+    },
+    {
+      "href": "/docs/audit-log",
+      "text": "Audit Logs"
+    },
+    {
+      "href": "/docs/vercel-firewall",
+      "text": "Firewall"
+    },
+    {
+      "href": "/docs/vercel-firewall/firewall-concepts",
+      "text": "Firewall Concepts"
+    },
+    {
+      "href": "/docs/vercel-firewall/ddos-mitigation",
+      "text": "DDoS Mitigation"
+    },
+    {
+      "href": "/docs/vercel-firewall/attack-challenge-mode",
+      "text": "Attack Challenge Mode"
+    },
+    {
+      "href": "/docs/vercel-firewall/vercel-waf",
+      "text": "Web Application Firewall"
+    },
+    {
+      "href": "/docs/vercel-firewall/vercel-waf/custom-rules",
+      "text": "Custom Rules"
+    },
+    {
+      "href": "/docs/vercel-firewall/vercel-waf/rate-limiting",
+      "text": "Rate Limiting"
+    },
+    {
+      "href": "/docs/vercel-firewall/vercel-waf/rule-configuration",
+      "text": "Rule Configuration"
+    },
+    {
+      "href": "/docs/vercel-firewall/vercel-waf/system-bypass-rules",
+      "text": "System Bypass Rules"
+    },
+    {
+      "href": "/docs/vercel-firewall/vercel-waf/rate-limiting-sdk",
+      "text": "Rate Limiting SDK"
+    },
+    {
+      "href": "/docs/vercel-firewall/vercel-waf/ip-blocking",
+      "text": "IP Blocking"
+    },
+    {
+      "href": "/docs/vercel-firewall/vercel-waf/managed-rulesets",
+      "text": "Managed Rulesets"
+    },
+    {
+      "href": "/docs/vercel-firewall/vercel-waf/examples",
+      "text": "Examples"
+    },
+    {
+      "href": "/docs/vercel-firewall/vercel-waf/usage-and-pricing",
+      "text": "Usage & Pricing"
+    },
+    {
+      "href": "/docs/vercel-firewall/firewall-api",
+      "text": "Firewall API"
+    },
+    {
+      "href": "/docs/vercel-firewall/firewall-observability",
+      "text": "Firewall Observability"
+    },
+    {
+      "href": "/docs/bot-management",
+      "text": "Bot Management"
+    },
+    {
+      "href": "/docs/botid",
+      "text": "BotID"
+    },
+    {
+      "href": "/docs/botid/get-started",
+      "text": "Get Started with BotID"
+    },
+    {
+      "href": "/docs/botid/verified-bots",
+      "text": "Handling Verified Bots"
+    },
+    {
+      "href": "/docs/botid/advanced-configuration",
+      "text": "Advanced BotID Configuration"
+    },
+    {
+      "href": "/docs/botid/form-submissions",
+      "text": "Form Submissions"
+    },
+    {
+      "href": "/docs/botid/local-development-behavior",
+      "text": "Local Development Behavior"
+    },
+    {
+      "href": "/docs/oidc",
+      "text": "OIDC"
+    },
+    {
+      "href": "/docs/oidc/aws",
+      "text": "AWS"
+    },
+    {
+      "href": "/docs/oidc/azure",
+      "text": "Azure"
+    },
+    {
+      "href": "/docs/oidc/api",
+      "text": "Connect your API"
+    },
+    {
+      "href": "/docs/oidc/gcp",
+      "text": "Google Cloud Platform"
+    },
+    {
+      "href": "/docs/oidc/reference",
+      "text": "OIDC Reference"
+    },
+    {
+      "href": "/docs/rbac",
+      "text": "RBAC"
+    },
+    {
+      "href": "/docs/rbac/access-roles",
+      "text": "Access Roles"
+    },
+    {
+      "href": "/docs/rbac/access-roles/project-level-roles",
+      "text": "Project Level Roles"
+    },
+    {
+      "href": "/docs/rbac/access-roles/team-level-roles",
+      "text": "Team Level Roles"
+    },
+    {
+      "href": "/docs/rbac/access-groups",
+      "text": "Access Groups"
+    },
+    {
+      "href": "/docs/rbac/managing-team-members",
+      "text": "Managing Team Members"
+    },
+    {
+      "href": "/docs/secure-compute",
+      "text": "Secure Compute"
+    },
+    {
+      "href": "/docs/two-factor-enforcement",
+      "text": "Two-factor Enforcement"
+    },
+    {
+      "href": "/docs/vercel-blob",
+      "text": "Blob"
+    },
+    {
+      "href": "/docs/vercel-blob/server-upload",
+      "text": "Server Uploads"
+    },
+    {
+      "href": "/docs/vercel-blob/client-upload",
+      "text": "Client Uploads"
+    },
+    {
+      "href": "/docs/vercel-blob/using-blob-sdk",
+      "text": "Using the SDK"
+    },
+    {
+      "href": "/docs/vercel-blob/usage-and-pricing",
+      "text": "Pricing"
+    },
+    {
+      "href": "/docs/vercel-blob/security",
+      "text": "Security"
+    },
+    {
+      "href": "/docs/vercel-blob/examples",
+      "text": "Examples"
+    },
+    {
+      "href": "/docs/edge-config",
+      "text": "Edge Config"
+    },
+    {
+      "href": "/docs/edge-config/get-started",
+      "text": "Getting Started"
+    },
+    {
+      "href": "/docs/edge-config/using-edge-config",
+      "text": "Using Edge Config"
+    },
+    {
+      "href": "/docs/edge-config/vercel-api",
+      "text": "Edge Configs & REST API"
+    },
+    {
+      "href": "/docs/edge-config/edge-config-dashboard",
+      "text": "Edge Configs & Dashboard"
+    },
+    {
+      "href": "/docs/edge-config/edge-config-sdk",
+      "text": "Edge Config SDK"
+    },
+    {
+      "href": "/docs/edge-config/edge-config-limits",
+      "text": "Limits & Pricing"
+    },
+    {
+      "href": "/docs/edge-config/edge-config-integrations",
+      "text": "Integrations"
+    },
+    {
+      "href": "/docs/edge-config/edge-config-integrations/devcycle-edge-config",
+      "text": "DevCycle"
+    },
+    {
+      "href": "/docs/edge-config/edge-config-integrations/hypertune-edge-config",
+      "text": "Hypertune"
+    },
+    {
+      "href": "/docs/edge-config/edge-config-integrations/launchdarkly-edge-config",
+      "text": "LaunchDarkly"
+    },
+    {
+      "href": "/docs/edge-config/edge-config-integrations/split-edge-config",
+      "text": "Split"
+    },
+    {
+      "href": "/docs/edge-config/edge-config-integrations/statsig-edge-config",
+      "text": "Statsig"
+    },
+    {
+      "href": "/docs/frameworks",
+      "text": "Supported Frameworks"
+    },
+    {
+      "href": "/docs/frameworks/full-stack",
+      "text": "Full-stack"
+    },
+    {
+      "href": "/docs/frameworks/full-stack",
+      "text": "PreviousFull-stack"
+    },
+    {
+      "href": "/docs/frameworks/full-stack/sveltekit",
+      "text": "NextSvelteKit"
+    }
+  ],
+  "code_blocks": [
+    "@vercel/functions",
+    "@vercel/og",
+    "@vercel/speed-insights",
+    "@vercel/analytics",
+    "vercel alias",
+    "vercel bisect",
+    "vercel blob",
+    "vercel build",
+    "vercel cache",
+    "vercel certs",
+    "vercel deploy",
+    "vercel dev",
+    "vercel dns",
+    "vercel domains",
+    "vercel env",
+    "vercel git",
+    "vercel help",
+    "vercel init",
+    "vercel inspect",
+    "vercel install"
+  ],
+  "collected_at": "2025-08-18T19:30:19.298Z"
+}

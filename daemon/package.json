@@ -1,9 +1,9 @@
 {
-  "name": "docudex-daemon",
+  "name": "grail-daemon",
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "bin": { "docudexd": "./src/index.js" },
+  "bin": { "graild": "./src/index.js" },
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "PORT=8787 node ./src/index.js",

@@ -5,8 +5,8 @@ PREFIX="${HOME}/.local/bin"
 mkdir -p "$PREFIX"
 
 # Link CLI executable
-ln -sf "$(pwd)/cli/src/index.js" "$PREFIX/docudex"
-chmod +x "$PREFIX/docudex"
+ln -sf "$(pwd)/cli/src/index.js" "$PREFIX/grail"
+chmod +x "$PREFIX/grail"
 
 # Link scripts
 for f in ai-session ai-watch ai-status ai-tree; do

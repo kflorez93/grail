@@ -1,9 +1,9 @@
 {
-  "name": "docudex-cli",
+  "name": "grail-cli",
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "bin": { "docudex": "./src/index.js" },
+  "bin": { "grail": "./src/index.js" },
   "scripts": {
     "start": "node ./src/index.js health",
     "health": "node ./src/index.js health --pretty",

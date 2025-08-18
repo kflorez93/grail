@@ -8,10 +8,10 @@ import { Readability } from "@mozilla/readability";
 
 const port = process.env.PORT ? Number(process.env.PORT) : 8787;
 const schemaVersion = "0.1.0";
-const maxParallel = Number(process.env.DOCUDEX_MAX_PARALLEL || 4);
-const requestsPerSecond = Number(process.env.DOCUDEX_RPS || 4);
-const cacheBaseEnv = process.env.DOCUDEX_CACHE_DIR || ".docudex-cache";
-const maxCacheRuns = Number(process.env.DOCUDEX_CACHE_MAX_RUNS || 100);
+const maxParallel = Number(process.env.GRAIL_MAX_PARALLEL || 4);
+const requestsPerSecond = Number(process.env.GRAIL_RPS || 4);
+const cacheBaseEnv = process.env.GRAIL_CACHE_DIR || ".grail-cache";
+const maxCacheRuns = Number(process.env.GRAIL_CACHE_MAX_RUNS || 100);
 
 let activeRequests = 0;
 const pendingQueue = [];
@@ -64,7 +64,7 @@ function readBody(req) {
 let pwModule;
 let sharedBrowser = null;
 async function getPlaywright() {
-  if (!pwModule && !process.env.DOCUDEX_DISABLE_BROWSER) {
+  if (!pwModule && !process.env.GRAIL_DISABLE_BROWSER) {
     try { pwModule = await import("playwright"); } catch (_) { pwModule = null; }
   }
   return pwModule;
@@ -244,7 +244,7 @@ async function handleExtract(req, res) {
     let effectiveUrl = url;
 
     // Lazy import Playwright if url provided
-    if (!html && url && !process.env.DOCUDEX_DISABLE_BROWSER) {
+    if (!html && url && !process.env.GRAIL_DISABLE_BROWSER) {
       const browser = await getBrowser();
       if (!browser) { return json(res, 501, { error: "playwright not installed", hint: "npm i -D playwright && npx playwright install", url }); }
       await acquireSlot();
@@ -373,5 +373,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(port, "127.0.0.1", () => {
-  console.log(`docudex daemon listening on http://127.0.0.1:${port}`);
+  console.log(`grail daemon listening on http://127.0.0.1:${port}`);
 });

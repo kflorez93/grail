@@ -1,4 +1,4 @@
-Docudex TODO
+Grail TODO
 
 MVP 0.1
 - Daemon: /health (done)
