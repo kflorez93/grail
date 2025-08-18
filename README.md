@@ -87,7 +87,7 @@ Watchers are registered under `.grail-cache/watchers/*.json` and reported by `ai
 - `GRAIL_CACHE_DIR`: base cache directory (default `.grail-cache`)
 - `GRAIL_MAX_PARALLEL`: concurrent operations (default 4)
 - `GRAIL_RPS`: requests per second rate limit (default 4)
-- `GRAIL_CACHE_MAX_RUNS`: max run directories to keep in cache (default 100)
+- `GRAIL_CACHE_MAX_RUNS`: max run directories to keep in cache (default 30)
 - `GRAIL_DISABLE_BROWSER`: set to `1` to disable Playwright usage
 - `GRAIL_SEARCH_PROVIDER`: `ddg` (default) or `google`
 - `GRAIL_GOOGLE_API_KEY` and `GRAIL_GOOGLE_CX`: set both to enable Google Custom Search provider

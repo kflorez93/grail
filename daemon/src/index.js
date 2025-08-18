@@ -13,7 +13,7 @@ const schemaVersion = "0.1.0";
 const maxParallel = Number(process.env.GRAIL_MAX_PARALLEL || 4);
 const requestsPerSecond = Number(process.env.GRAIL_RPS || 4);
 const cacheBaseEnv = process.env.GRAIL_CACHE_DIR || ".grail-cache";
-const maxCacheRuns = Number(process.env.GRAIL_CACHE_MAX_RUNS || 100);
+const maxCacheRuns = Number(process.env.GRAIL_CACHE_MAX_RUNS || 30);
 
 let activeRequests = 0;
 const pendingQueue = [];

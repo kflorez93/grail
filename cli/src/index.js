@@ -356,6 +356,50 @@ function request(method, path, body) {
   } else if (cmd === "init") {
     const { flags } = parseFlags(process.argv.slice(3));
     const pretty = Boolean(flags.pretty || flags.json || flags.j);
+    const ensureDaemonStarted = async () => {
+      // Skip if user opts out
+      if (String(process.env.GRAIL_INIT_AUTO_START || "1") === "0") return { attempted: false, started: false };
+      try {
+        const res = await request("GET", "/health");
+        if (res && res.statusCode === 200) return { attempted: false, started: true };
+      } catch (_) { /* not running */ }
+      // Try to spawn in background
+      try { spawnSync(process.execPath, [path.resolve(process.cwd(), "./daemon/src/index.js")], { detached: true, stdio: "ignore" }); } catch (_) { /* ignore */ }
+      try {
+        const { spawn } = await import("node:child_process");
+        const child = spawn(process.execPath, [path.resolve(process.cwd(), "./daemon/src/index.js")], { detached: true, stdio: "ignore" });
+        child.unref();
+      } catch (_) {}
+      // Poll for health
+      for (let i = 0; i < 20; i += 1) {
+        try {
+          const res = await request("GET", "/health");
+          if (res && res.statusCode === 200) return { attempted: true, started: true };
+        } catch (_) {}
+        await new Promise(r => setTimeout(r, 250));
+      }
+      return { attempted: true, started: false };
+    };
+
+    const ensurePlaywrightDeps = async () => {
+      // Skip if user opts out or browser disabled
+      if (process.env.GRAIL_DISABLE_BROWSER) return { attempted: false, installed: false };
+      if (String(process.env.GRAIL_INIT_AUTO_DEPS || "1") === "0") return { attempted: false, installed: false };
+      try { await import("playwright"); return { attempted: false, installed: true }; } catch (_) {}
+      // Try to install dev dep and browsers
+      try {
+        spawnSync("npm", ["i", "-D", "playwright", "--no-fund", "--no-audit"], { stdio: "ignore" });
+        const { spawn } = await import("node:child_process");
+        await new Promise((resolve) => {
+          const p = spawn("npx", ["playwright", "install", "--with-deps"], { stdio: "ignore" });
+          p.on("close", () => resolve());
+          p.on("error", () => resolve());
+        });
+        try { await import("playwright"); return { attempted: true, installed: true }; } catch (_) { return { attempted: true, installed: false }; }
+      } catch (_) {
+        return { attempted: true, installed: false };
+      }
+    };
     // Gather doctor info
     let health = null;
     try {
@@ -479,7 +523,12 @@ ${manifest.commands.map(c=>`- ${c.name}: ${c.desc||""}`).join("\n")}
 `;
     fs.writeFileSync("GRAIL_INIT.md", md, "utf8");
     fs.writeFileSync("grail.manifest.json", JSON.stringify(manifest, null, 2), "utf8");
-    const output = { wrote: [ "GRAIL_INIT.md", "grail.manifest.json" ], doctor: { daemon: health, tools: { tmux: hasTmux, watchexec: hasWatchexec, entr: hasEntr }, playwright: hasPlaywright, search: { provider, ready: providerReady } } };
+
+    // Auto-start daemon and ensure deps
+    const autoDeps = await ensurePlaywrightDeps();
+    const autoDaemon = await ensureDaemonStarted();
+
+    const output = { wrote: [ "GRAIL_INIT.md", "grail.manifest.json" ], doctor: { daemon: health, tools: { tmux: hasTmux, watchexec: hasWatchexec, entr: hasEntr }, playwright: hasPlaywright, search: { provider, ready: providerReady } }, auto: { deps: autoDeps, daemon: autoDaemon } };
     console.log(JSON.stringify(output, null, pretty ? 2 : 0));
     process.exit(0);
   } else if (cmd === "version" || cmd === "--version" || cmd === "-v") {
