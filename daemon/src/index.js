@@ -5,6 +5,44 @@ import path from "node:path";
 import os from "node:os";
 
 const port = process.env.PORT ? Number(process.env.PORT) : 8787;
+const schemaVersion = "0.1.0";
+const maxParallel = Number(process.env.DOCUDEX_MAX_PARALLEL || 4);
+const requestsPerSecond = Number(process.env.DOCUDEX_RPS || 4);
+const cacheBaseEnv = process.env.DOCUDEX_CACHE_DIR || ".docudex-cache";
+
+let activeRequests = 0;
+const pendingQueue = [];
+let lastRequestTimestamps = [];
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function acquireSlot() {
+  if (activeRequests < maxParallel) {
+    activeRequests += 1;
+    return;
+  }
+  await new Promise(resolve => pendingQueue.push(resolve));
+  activeRequests += 1;
+}
+
+function releaseSlot() {
+  activeRequests = Math.max(0, activeRequests - 1);
+  const next = pendingQueue.shift();
+  if (next) next();
+}
+
+async function rateLimit() {
+  const now = Date.now();
+  // purge timestamps older than 1s
+  lastRequestTimestamps = lastRequestTimestamps.filter(t => now - t < 1000);
+  if (lastRequestTimestamps.length >= requestsPerSecond) {
+    const waitMs = 1000 - (now - lastRequestTimestamps[0]);
+    if (waitMs > 0) await sleep(waitMs);
+  }
+  lastRequestTimestamps.push(Date.now());
+}
 
 function json(res, code, data) {
   res.writeHead(code, { "content-type": "application/json" });
@@ -20,6 +58,40 @@ function readBody(req) {
   });
 }
 
+async function renderUrlWithPlaywright(pw, url, wait) {
+  const browser = await pw.chromium.launch({ headless: true });
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  const waitStrategy = (wait && wait.strategy) || "networkidle";
+  try {
+    await page.goto(url, { waitUntil: ["networkidle", "load", "domcontentloaded"].includes(waitStrategy) ? "networkidle" : "load", timeout: 30000 });
+    if (waitStrategy === "selector" && wait && wait.selector) {
+      await page.waitForSelector(wait.selector, { timeout: 10000 });
+    } else if (waitStrategy === "timeout" && wait && typeof wait.ms === "number") {
+      await sleep(Math.max(0, wait.ms));
+    }
+    const title = await page.title();
+    const html = await page.content();
+    return { browser, ctx, page, title, html };
+  } catch (err) {
+    await ctx.close();
+    await browser.close();
+    throw err;
+  }
+}
+
+function ensureAbsolute(p) {
+  return path.isAbsolute(p) ? p : path.resolve(process.cwd(), p);
+}
+
+function ensureRunDir(baseDir) {
+  const absBase = ensureAbsolute(baseDir);
+  const stamp = Date.now().toString();
+  const runDir = path.join(absBase, stamp);
+  fs.mkdirSync(runDir, { recursive: true });
+  return runDir;
+}
+
 async function handleRender(req, res) {
   try {
     const bodyRaw = await readBody(req);
@@ -27,6 +99,7 @@ async function handleRender(req, res) {
     try { payload = bodyRaw ? JSON.parse(bodyRaw) : {}; } catch (_) {}
     const url = (payload.url || "").trim();
     const outDir = (payload.outDir || "").trim();
+    const wait = payload.wait || undefined;
     if (!url) { return json(res, 400, { error: "url is required" }); }
 
     // Lazy import Playwright if available
@@ -44,18 +117,13 @@ async function handleRender(req, res) {
       return json(res, 501, { error: "playwright not installed", hint: "npm i -D playwright && npx playwright install", url });
     }
 
-    const browser = await pw.chromium.launch({ headless: true });
-    const ctx = await browser.newContext();
-    const page = await ctx.newPage();
-    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
-    const title = await page.title();
-    const html = await page.content();
+    await acquireSlot();
+    await rateLimit();
+    const { browser, ctx, page, title, html } = await renderUrlWithPlaywright(pw, url, wait);
 
     // Write artifacts
-    const baseDir = outDir || path.join(process.cwd(), ".docudex-cache");
-    const stamp = Date.now().toString();
-    const runDir = path.join(baseDir, stamp);
-    fs.mkdirSync(runDir, { recursive: true });
+    const baseDir = outDir || cacheBaseEnv;
+    const runDir = ensureRunDir(baseDir);
     const finalHtmlPath = path.join(runDir, "final.html");
     fs.writeFileSync(finalHtmlPath, html, "utf8");
 
@@ -70,15 +138,103 @@ async function handleRender(req, res) {
 
     await ctx.close();
     await browser.close();
+    releaseSlot();
 
     return json(res, 200, {
+      schema_version: schemaVersion,
       url,
       title,
-      final_html: finalHtmlPath,
-      screenshot: screenshotPath || undefined,
+      final_html: ensureAbsolute(finalHtmlPath),
+      screenshot: screenshotPath ? ensureAbsolute(screenshotPath) : undefined,
     });
   } catch (err) {
+    releaseSlot();
     return json(res, 500, { error: "render failed", message: String(err && err.message || err) });
+  }
+}
+
+function extractPlainText(html) {
+  try {
+    // remove script/style
+    const withoutScripts = html.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "");
+    // replace breaks/paragraphs with newlines
+    const withNewlines = withoutScripts.replace(/<(\/)?(p|br|h[1-6]|li|div)>/gi, "\n");
+    // strip tags
+    const text = withNewlines.replace(/<[^>]+>/g, "");
+    // collapse whitespace
+    return text.replace(/\s+$/gm, "").replace(/[\t ]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+  } catch (_) {
+    return "";
+  }
+}
+
+function collectBasicMeta(html, url) {
+  const titleMatch = html.match(/<title>([\s\S]*?)<\/title>/i);
+  const title = titleMatch ? titleMatch[1].trim() : "";
+  const headings = [];
+  const headingRegex = /<(h[1-6])[^>]*>([\s\S]*?)<\/\1>/gi;
+  let m;
+  while ((m = headingRegex.exec(html)) !== null) {
+    const level = m[1];
+    const text = m[2].replace(/<[^>]+>/g, "").trim();
+    headings.push({ level, text });
+  }
+  const linkRegex = /<a[^>]*href=["']([^"'#]+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+  const links = [];
+  while ((m = linkRegex.exec(html)) !== null) {
+    const href = m[1];
+    const text = m[2].replace(/<[^>]+>/g, "").trim();
+    links.push({ href, text });
+  }
+  return { title, url, headings, links, collected_at: new Date().toISOString() };
+}
+
+async function handleExtract(req, res) {
+  try {
+    const bodyRaw = await readBody(req);
+    let payload = {};
+    try { payload = bodyRaw ? JSON.parse(bodyRaw) : {}; } catch (_) {}
+    const url = (payload.url || "").trim();
+    const htmlInput = typeof payload.html === "string" ? payload.html : "";
+    const outDir = (payload.outDir || "").trim();
+    const wait = payload.wait || undefined;
+    if (!url && !htmlInput) { return json(res, 400, { error: "html or url is required" }); }
+
+    let html = htmlInput;
+    let effectiveUrl = url;
+
+    // Lazy import Playwright if url provided
+    if (!html && url && !process.env.DOCUDEX_DISABLE_BROWSER) {
+      let pw;
+      try { pw = await import("playwright"); } catch (e) {}
+      if (!pw) { return json(res, 501, { error: "playwright not installed", hint: "npm i -D playwright && npx playwright install", url }); }
+      await acquireSlot();
+      await rateLimit();
+      const { browser, ctx, page, html: pageHtml } = await renderUrlWithPlaywright(pw, url, wait);
+      html = pageHtml;
+      try { await ctx.close(); await browser.close(); } catch (_) {}
+      releaseSlot();
+    }
+
+    if (!html) { return json(res, 400, { error: "failed to obtain html" }); }
+
+    const baseDir = outDir || cacheBaseEnv;
+    const runDir = ensureRunDir(baseDir);
+    const readablePath = path.join(runDir, "readable.txt");
+    const metaPath = path.join(runDir, "meta.json");
+    const text = extractPlainText(html);
+    const meta = collectBasicMeta(html, effectiveUrl || undefined);
+    fs.writeFileSync(readablePath, text, "utf8");
+    fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2), "utf8");
+
+    return json(res, 200, {
+      schema_version: schemaVersion,
+      readable_txt: ensureAbsolute(readablePath),
+      meta_json: ensureAbsolute(metaPath)
+    });
+  } catch (err) {
+    releaseSlot();
+    return json(res, 500, { error: "extract failed", message: String(err && err.message || err) });
   }
 }
 
@@ -90,13 +246,18 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") { res.writeHead(204); res.end(); return; }
 
   if (req.method === "GET" && req.url && (req.url === "/" || req.url.startsWith("/health"))) {
-    const body = { status: "ok", port, browser: process.env.DOCUDEX_DISABLE_BROWSER ? "disabled" : "auto" };
+    const body = { status: "ok", port, browser: process.env.DOCUDEX_DISABLE_BROWSER ? "disabled" : "auto", schema_version: schemaVersion, limits: { maxParallel, rps: requestsPerSecond } };
     json(res, 200, body);
     return;
   }
 
   if (req.method === "POST" && req.url === "/render") {
     await handleRender(req, res);
+    return;
+  }
+
+  if (req.method === "POST" && req.url === "/extract") {
+    await handleExtract(req, res);
     return;
   }
 

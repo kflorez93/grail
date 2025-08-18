@@ -42,8 +42,33 @@ function request(method, path, body) {
       console.error("Error: render failed");
       process.exit(1);
     }
+  } else if (cmd === "extract") {
+    const input = process.argv[3];
+    if (!input) {
+      console.error("Usage: docudex extract <file|url> [outDir]");
+      process.exit(2);
+    }
+    const outDir = process.argv[4] || "";
+    try {
+      // If input looks like a URL, send { url }; otherwise read file contents and send { html }
+      const isUrl = /^(https?:)\/\//i.test(input);
+      let payload;
+      if (isUrl) {
+        payload = { url: input, outDir };
+      } else {
+        const fs = await import("node:fs");
+        const html = fs.readFileSync(input, "utf8");
+        payload = { html, outDir };
+      }
+      const res = await request("POST", "/extract", payload);
+      console.log(res.body);
+      process.exit(res.statusCode === 200 ? 0 : 1);
+    } catch (err) {
+      console.error("Error: extract failed");
+      process.exit(1);
+    }
   } else {
-    console.error("Usage: docudex health | docudex render <url> [outDir]");
+    console.error("Usage: docudex health | docudex render <url> [outDir] | docudex extract <file|url> [outDir]");
     process.exit(2);
   }
 })();
