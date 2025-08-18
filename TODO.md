@@ -8,12 +8,12 @@ MVP 0.1
 - Project: consistent logging, error shapes, JSON schema notes
 
 MVP 0.2
-- Daemon: extract (Readability + metadata) → readable.txt, meta.json
-- Daemon: configurable wait strategies (networkidle | selector | timeout)
-- Daemon: parallel limit and basic rate limiting
-- CLI: extract <file|url> → calls /extract or /render+extract
-- CLI: JSON output flag passthrough
-- Cache dir management and absolute artifact paths; begin versioned JSON schema
+- Daemon: extract (Readability + metadata) → readable.txt, meta.json (done)
+- Daemon: configurable wait strategies (networkidle | selector | timeout) (done)
+- Daemon: parallel limit and basic rate limiting (done)
+- CLI: extract <file|url> → calls /extract or /render+extract (done)
+- CLI: JSON output flag passthrough (done)
+- Cache dir management and absolute artifact paths; begin versioned JSON schema (done)
 
 MVP 0.3
 - Daemon: batch endpoint

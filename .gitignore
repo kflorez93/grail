@@ -44,3 +44,6 @@ playwright/.cache/
 .turbo/
 .next/
 .vercel/
+
+# Ignore cache artifacts for git
+.docudex-cache/
