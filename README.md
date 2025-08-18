@@ -4,8 +4,10 @@
     <img alt="Grail" src="branding/grail_logo.png" width="360" />
   </picture>
 </p>
- 
-# Grail
+
+<p align="center">
+  <sub><code>Node 20+</code> • <code>Playwright</code> • <code>Headless Chromium</code> • <code>JSDOM</code> • <code>@mozilla/readability</code> • <code>Rate limiting</code> • <code>JSON/JSONL</code> • <code>CLI-first</code> • <code>ESM</code> • <code>MIT</code> • <code>GitHub Actions</code></sub>
+</p>
 
 Research & QA toolkit for terminal AIs. Daemon provides headless browser + extraction; CLI orchestrates search, docs bundling, and long‑lived sessions.
 
