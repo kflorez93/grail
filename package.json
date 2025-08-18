@@ -1,17 +1,29 @@
 {
-  "name": "docudex",
-  "version": "1.0.0",
-  "description": "Docudex (placeholder name)",
+  "name": "grail",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Grail: research & QA toolkit for terminal AIs",
   "main": "index.js",
   "scripts": {
-    "test": "node ./tests/smoke.mjs",
-    "ci:smoke": "./scripts/ci-smoke.sh"
+    "test": "node ./tests/smoke.mjs && node ./tests/unit_flags.mjs && node ./tests/unit_score.mjs",
+    "ci:smoke": "./scripts/ci-smoke.sh",
+    "lint": "eslint .",
+    "ci:lint": "eslint . --max-warnings=0",
+    "ci:test": "npm run lint && npm test"
   },
-  "keywords": [],
+  "keywords": ["grail", "cli", "research", "docs", "qa"],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "@mozilla/readability": "^0.6.0",
+    "eslint": "^8.57.0",
     "jsdom": "^26.1.0",
     "playwright": "^1.54.2"
   }

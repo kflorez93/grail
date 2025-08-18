@@ -2,11 +2,13 @@
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
-import os from "node:os";
+// import os from "node:os";
 import { JSDOM } from "jsdom";
 import { Readability } from "@mozilla/readability";
 
 const port = process.env.PORT ? Number(process.env.PORT) : 8787;
+const VERSION = "0.1.0";
+const startTimeMs = Date.now();
 const schemaVersion = "0.1.0";
 const maxParallel = Number(process.env.GRAIL_MAX_PARALLEL || 4);
 const requestsPerSecond = Number(process.env.GRAIL_RPS || 4);
@@ -50,6 +52,15 @@ async function rateLimit() {
 function json(res, code, data) {
   res.writeHead(code, { "content-type": "application/json" });
   res.end(JSON.stringify(data));
+}
+
+function logError(context, err) {
+  try {
+    const msg = err && err.message ? err.message : String(err);
+    // Keep terse to avoid noise in tests/CI
+    // eslint-disable-next-line no-console
+    console.error(`[grail] ${context}: ${msg}`);
+  } catch (_) { /* ignore logging errors */ }
 }
 
 function readBody(req) {
@@ -97,7 +108,7 @@ async function renderUrlWithPlaywright(browser, url, wait) {
       return { ctx, page, title, html };
     } catch (err) {
       lastErr = err;
-      try { await ctx.close(); } catch (_) {}
+      try { await ctx.close(); } catch (_) { /* ignore context close error */ }
       const backoff = 300 + Math.floor(Math.random() * 300) * (attempt + 1);
       await sleep(backoff);
     }
@@ -134,9 +145,9 @@ function pruneCacheRuns(baseDir) {
     toDelete.forEach(e => {
       try {
         fs.rmSync(e.path, { recursive: true, force: true });
-      } catch (_) {}
+      } catch (_) { /* ignore rm error */ }
     });
-  } catch (_) {}
+  } catch (_) { /* ignore prune errors */ }
 }
 
 async function performRender(payload) {
@@ -161,7 +172,7 @@ async function performRender(payload) {
       screenshotPath = path.join(runDir, "page.png");
       await page.screenshot({ path: screenshotPath, fullPage: true });
     } catch (_) { screenshotPath = ""; }
-    try { await ctx.close(); } catch (_) {}
+    try { await ctx.close(); } catch (_) { /* ignore context close error */ }
     pruneCacheRuns(baseDir);
     return {
       schema_version: schemaVersion,
@@ -179,7 +190,7 @@ async function handleRender(req, res) {
   try {
     const bodyRaw = await readBody(req);
     let payload = {};
-    try { payload = bodyRaw ? JSON.parse(bodyRaw) : {}; } catch (_) {}
+    try { payload = bodyRaw ? JSON.parse(bodyRaw) : {}; } catch (e) { logError("render:bad-json", e); payload = {}; }
     try {
       const result = await performRender(payload);
       return json(res, 200, result);
@@ -233,7 +244,7 @@ async function handleExtract(req, res) {
   try {
     const bodyRaw = await readBody(req);
     let payload = {};
-    try { payload = bodyRaw ? JSON.parse(bodyRaw) : {}; } catch (_) {}
+    try { payload = bodyRaw ? JSON.parse(bodyRaw) : {}; } catch (e) { logError("render:bad-json", e); payload = {}; }
     const url = (payload.url || "").trim();
     const htmlInput = typeof payload.html === "string" ? payload.html : "";
     const outDir = (payload.outDir || "").trim();
@@ -249,9 +260,9 @@ async function handleExtract(req, res) {
       if (!browser) { return json(res, 501, { error: "playwright not installed", hint: "npm i -D playwright && npx playwright install", url }); }
       await acquireSlot();
       await rateLimit();
-      const { ctx, page, html: pageHtml } = await renderUrlWithPlaywright(browser, url, wait);
+      const { ctx, html: pageHtml } = await renderUrlWithPlaywright(browser, url, wait);
       html = pageHtml;
-      try { await ctx.close(); } catch (_) {}
+      try { await ctx.close(); } catch (e) { logError('extract:ctx-close', e); }
       releaseSlot();
     }
 
@@ -316,7 +327,15 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") { res.writeHead(204); res.end(); return; }
 
   if (req.method === "GET" && req.url && (req.url === "/" || req.url.startsWith("/health"))) {
-    const body = { status: "ok", port, browser: process.env.DOCUDEX_DISABLE_BROWSER ? "disabled" : "auto", schema_version: schemaVersion, limits: { maxParallel, rps: requestsPerSecond } };
+    const body = {
+      status: "ok",
+      port,
+      version: VERSION,
+      uptime_ms: Date.now() - startTimeMs,
+      browser: process.env.GRAIL_DISABLE_BROWSER ? "disabled" : "auto",
+      schema_version: schemaVersion,
+      limits: { maxParallel, rps: requestsPerSecond }
+    };
     json(res, 200, body);
     return;
   }
@@ -335,7 +354,7 @@ const server = http.createServer(async (req, res) => {
     try {
       const bodyRaw = await readBody(req);
       let payload = {};
-      try { payload = bodyRaw ? JSON.parse(bodyRaw) : {}; } catch (_) {}
+      try { payload = bodyRaw ? JSON.parse(bodyRaw) : {}; } catch (e) { logError('batch:bad-json', e); payload = {}; }
       const urls = Array.isArray(payload.urls) ? payload.urls : [];
       const parallel = Number(payload.parallel || maxParallel);
       const outDir = (payload.outDir || "").trim();
@@ -344,7 +363,7 @@ const server = http.createServer(async (req, res) => {
 
       let index = 0;
       const results = new Array(urls.length);
-      async function worker() {
+      const worker = async () => {
         while (true) {
           const i = index; index += 1;
           if (i >= urls.length) break;
@@ -358,15 +377,12 @@ const server = http.createServer(async (req, res) => {
             else results[i] = { error: String(e && e.message || e), url: u };
           }
         }
-      }
+      };
       const workers = Array.from({ length: Math.max(1, Math.min(parallel, urls.length)) }, () => worker());
       await Promise.all(workers);
       json(res, 200, { schema_version: schemaVersion, results });
       return;
-    } catch (err) {
-      json(res, 500, { error: "batch failed", message: String(err && err.message || err) });
-      return;
-    }
+    } catch (err) { json(res, 500, { error: "batch failed", message: String(err && err.message || err) }); return; }
   }
 
   json(res, 404, { error: "not found" });
@@ -375,3 +391,10 @@ const server = http.createServer(async (req, res) => {
 server.listen(port, "127.0.0.1", () => {
   console.log(`grail daemon listening on http://127.0.0.1:${port}`);
 });
+
+function shutdown(signal) {
+  try { if (sharedBrowser) { sharedBrowser.close().catch((e) => logError('shutdown:browser-close', e)); } } catch (e) { logError('shutdown:browser-close', e); }
+  try { server.close(() => process.exit(0)); } catch (_) { process.exit(0); }
+}
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));

@@ -4,24 +4,71 @@
     <img alt="Grail" src="branding/grail_logo.png" width="360" />
   </picture>
 </p>
+ 
+# Grail
 
-Grail
+Research & QA toolkit for terminal AIs. Daemon provides headless browser + extraction; CLI orchestrates search, docs bundling, and long‑lived sessions.
 
-Minimal scaffold: daemon exposes /health; CLI checks it.
+## Features
 
-Usage
-Install locally (expose commands on PATH):
+- Headless render and readable extraction (Playwright + Readability)
+- Search/pick workflow for official docs; docs bundles with artifacts
+- Rate limiting and parallelism controls
+- Long‑lived sessions and watchers helpers for dev/test loops
+
+## Requirements
+
+- Node.js 20+
+- Optional: Playwright for browser rendering/screenshots
+
+## Installation
+
+Local install (expose commands on PATH):
 
 ```
 ./scripts/install-local.sh
 export PATH="$HOME/.local/bin:$PATH"
+```
 
-# Initialize onboarding files in your project
+## Quick start
+
+Initialize onboarding files in your project and teach your agent about Grail:
+
+```
 grail init --pretty
 cat GRAIL_INIT.md
 ```
 
-- Sessions & QA scripts:
+Start daemon in a long‑lived shell:
+
+```
+node ./daemon/src/index.js
+```
+
+Health and environment check:
+
+```
+node ./cli/src/index.js health --pretty
+node ./cli/src/index.js doctor --pretty
+```
+
+Search → pick → docs bundle:
+
+```
+node ./cli/src/index.js search "nextjs static generation" --site vercel.com
+node ./cli/src/index.js pick   "nextjs static generation" --site vercel.com --n 3
+node ./cli/src/index.js docs   "nextjs static generation" --site vercel.com --n 3 --pretty
+```
+
+Render and extract:
+
+```
+node ./cli/src/index.js render "https://example.com" .grail-cache --wait-strategy networkidle --pretty
+node ./cli/src/index.js extract ./path/to/file.html --pretty
+node ./cli/src/index.js extract "https://example.com/docs" --wait-strategy selector --wait-selector main --pretty
+```
+
+Sessions & QA scripts:
 
 ```
 ./scripts/ai-session list
@@ -36,41 +83,7 @@ cat GRAIL_INIT.md
 
 Watchers are registered under `.grail-cache/watchers/*.json` and reported by `ai-status`.
 
-- Start daemon:
-
-```
-node ./daemon/src/index.js
-```
-
-- Health:
-
-```
-node ./cli/src/index.js health --pretty
-node ./cli/src/index.js doctor --pretty
-```
-
-- Render a URL (writes final.html and page.png to cache dir):
-
-```
-node ./cli/src/index.js render "https://example.com" .grail-cache --wait-strategy networkidle --pretty
-```
-
-- Extract from a local HTML file or fetch-and-extract from a URL:
-
-```
-node ./cli/src/index.js extract ./path/to/file.html --pretty
-node ./cli/src/index.js extract "https://example.com/docs" --wait-strategy selector --wait-selector main --pretty
-```
-
-- Batch/docs workflow (stub search/pick, real batch render):
-
-```
-node ./cli/src/index.js search "nextjs static generation" --site vercel.com
-node ./cli/src/index.js pick "nextjs static generation" --site vercel.com
-node ./cli/src/index.js docs "nextjs static generation" --site vercel.com --n 3 --pretty
-```
-
-Environment
+## Configuration
 
 - `PORT`: daemon port (default 8787)
 - `GRAIL_CACHE_DIR`: base cache directory (default `.grail-cache`)
@@ -87,3 +100,16 @@ Install Playwright to enable browser rendering:
 npm i -D playwright
 npx playwright install --with-deps
 ```
+
+## Contributing
+
+PRs welcome. Please run:
+
+```
+npm ci
+npm run ci:test
+```
+
+## License
+
+MIT – see `LICENSE`.

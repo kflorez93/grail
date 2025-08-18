@@ -118,9 +118,7 @@ async function providerSearch(query, site, n) {
       const items = parseDuckDuckGoHtml(res.body, n);
       if (items.length) return items;
     }
-  } catch (_) {
-    // fall through to stub
-  }
+  } catch (_) { /* ignore provider error, fall through */ }
   // Fallback stub
   return Array.from({ length: n }, (_, i) => ({
     title: `Stub Result ${i + 1} for ${query}`,
@@ -137,7 +135,7 @@ function scoreHeuristics(url) {
     if (/\/docs(\/|$)/.test(u.pathname)) score += 4;
     if (/vercel|nextjs|react|prisma|js|api|reference/i.test(u.pathname)) score += 1;
     if (/blog|forum|community|legacy|v1|old/i.test(u.pathname)) score -= 3;
-  } catch (_) {}
+  } catch (_) { /* ignore url parse error */ }
   return score;
 }
 
@@ -367,7 +365,7 @@ function request(method, path, body) {
     const hasTmux = spawnSync("tmux", ["-V"], { stdio: "ignore" }).status === 0;
     const hasWatchexec = spawnSync("watchexec", ["--version"], { stdio: "ignore" }).status === 0;
     const hasEntr = spawnSync("entr", ["-v"], { stdio: "ignore" }).status === 0;
-    let hasPlaywright = false; try { await import("playwright"); hasPlaywright = true; } catch (_) {}
+    let hasPlaywright = false; try { await import("playwright"); hasPlaywright = true; } catch (_) { hasPlaywright = false; }
     const provider = process.env.GRAIL_SEARCH_PROVIDER || "ddg";
     const providerReady = provider === "ddg" || (provider === "google" && process.env.GRAIL_GOOGLE_API_KEY && process.env.GRAIL_GOOGLE_CX);
 
@@ -395,7 +393,20 @@ function request(method, path, body) {
         GRAIL_SEARCH_PROVIDER: "ddg|google",
         GRAIL_GOOGLE_API_KEY: "required if provider=google",
         GRAIL_GOOGLE_CX: "required if provider=google"
-      }
+      },
+      schemas: {
+        render: { schema_version: "string", url: "string", title: "string", final_html: "abs path", screenshot: "abs path?" },
+        extract: { schema_version: "string", readable_txt: "abs path", meta_json: "abs path" },
+        batch: { schema_version: "string", results: "array of render or error" },
+        docs: { bundle_json: "abs path" },
+        status: { sessions: "array", watchers: "array", git_diff_stat: "string" }
+      },
+      examples: [
+        "grail health --pretty",
+        "grail search 'nextjs static generation' --site vercel.com",
+        "grail pick 'nextjs static generation' --site vercel.com --n 3",
+        "grail docs 'nextjs static generation' --site vercel.com --n 3 --pretty"
+      ]
     };
 
     // Migrate legacy cache dir to .grail-cache if present
@@ -405,10 +416,67 @@ function request(method, path, body) {
       if (fs.existsSync(legacy) && !fs.existsSync(next)) {
         fs.renameSync(legacy, next);
       }
-    } catch (_) {}
+    } catch (_) { /* ignore migration errors */ }
 
-    // Write onboarding guide
-    const md = `# Grail Init\n\nGrail is a CLI-first research & QA toolkit for terminal AIs.\n\n## Quick start\n\n- Start daemon in a long-lived shell:\n\n\`node ./daemon/src/index.js\`\n\n- Health:\n\n\`grail health --pretty\`\n\n- Docs bundle (example):\n\n\`grail docs \"nextjs static generation\" --site vercel.com --n 3 --pretty\`\n\n- Sessions & QA:\n\n\`./scripts/ai-session new server \"pnpm dev\"\`\n\n\`./scripts/ai-watch src \"pytest -q\"\`\n\n\`./scripts/ai-status\`\n\n## Environment\n\n- Playwright: ${hasPlaywright ? "installed" : "missing"}\n- tmux: ${hasTmux ? "installed" : "missing"}\n- watcher (watchexec/entr): ${hasWatchexec || hasEntr ? "available" : "missing"}\n- search provider: ${provider} (${providerReady ? "ready" : "not configured"})\n\n## Commands\n\n${manifest.commands.map(c=>`- ${c.name}: ${c.desc||""}`).join("\n")}\n\n## Files\n\n- This guide: GRAIL_INIT.md\n- Manifest: grail.manifest.json\n`;
+    // Write onboarding guide without images for lightweight output
+    const md = `# Grail Init
+
+Grail is a CLI-first research & QA toolkit for terminal AIs.
+
+## Agent guide: when to use Grail
+
+- Use \`grail search\` + \`grail pick\` to find official docs quickly (prefer "docs." and "/docs" URLs).
+- Use \`grail docs\` to fetch N top docs and persist a bundle for later reference.
+- Use \`grail render\` when a page requires JS to fully load or when you need a screenshot.
+- Use \`grail extract\` to turn HTML (from URL or file) into readable text + structured metadata.
+- Use scripts for long-lived tasks:
+  - \`./scripts/ai-session new server "pnpm dev"\` to keep a dev server running.
+  - \`./scripts/ai-watch src "pytest -q"\` to re-run tests on change.
+  - \`./scripts/ai-status\` to report sessions, watchers, and recent git diff.
+
+Heuristics:
+- If unsure which docs to trust, run \`grail pick\` and prefer URLs ranked highest.
+- If Playwright isn’t installed, \`render\` and URL-based \`extract\` will return 501 with a hint.
+- Persist artifacts are under \`.grail-cache\`; keep and reference \`bundle.json\` outputs.
+
+## Quick start
+
+- Start daemon in a long-lived shell:
+
+\`node ./daemon/src/index.js\`
+
+- Health:
+
+\`grail health --pretty\`
+
+- Docs bundle (example):
+
+\`grail docs "nextjs static generation" --site vercel.com --n 3 --pretty\`
+
+- Sessions & QA:
+
+\`./scripts/ai-session new server "pnpm dev"\`
+
+\`./scripts/ai-watch src "pytest -q"\`
+
+\`./scripts/ai-status\`
+
+## Environment
+
+- Playwright: ${hasPlaywright ? "installed" : "missing"}
+- tmux: ${hasTmux ? "installed" : "missing"}
+- watcher (watchexec/entr): ${hasWatchexec || hasEntr ? "available" : "missing"}
+- search provider: ${provider} (${providerReady ? "ready" : "not configured"})
+
+## Commands
+
+${manifest.commands.map(c=>`- ${c.name}: ${c.desc||""}`).join("\n")}
+
+## Files
+
+- This guide: GRAIL_INIT.md
+- Manifest: grail.manifest.json (includes schemas and examples)
+`;
     fs.writeFileSync("GRAIL_INIT.md", md, "utf8");
     fs.writeFileSync("grail.manifest.json", JSON.stringify(manifest, null, 2), "utf8");
     const output = { wrote: [ "GRAIL_INIT.md", "grail.manifest.json" ], doctor: { daemon: health, tools: { tmux: hasTmux, watchexec: hasWatchexec, entr: hasEntr }, playwright: hasPlaywright, search: { provider, ready: providerReady } } };
@@ -418,7 +486,7 @@ function request(method, path, body) {
     console.log(VERSION);
     process.exit(0);
   } else if (cmd === "help" || cmd === "--help" || cmd === "-h") {
-    const help = `grail ${VERSION}\n\nCommands:\n  health [--pretty]\n  render <url> [outDir] [--wait-...]\n  extract <file|url> [outDir] [--wait-...]\n  search <query> [--site <domain>] [--n <int>]\n  pick <query> --prefer official [--site <domain>] [--n <int>]\n  docs <topic> --site <domain> [--n <int>] [--pretty]\n  doctor [--pretty]\n  version\n  help\n`;
+    const help = `grail ${VERSION}\n\nCommands:\n  health [--pretty]\n  render <url> [outDir] [--wait-...]\n  extract <file|url> [outDir] [--wait-...]\n  search <query> [--site <domain>] [--n <int>]\n  pick <query> --prefer official [--site <domain>] [--n <int>]\n  docs <topic> --site <domain> [--n <int>] [--pretty]\n  doctor [--pretty]\n  init [--pretty]\n  version\n  help\n`;
     console.log(help);
     process.exit(0);
   } else if (cmd === "manifest") {

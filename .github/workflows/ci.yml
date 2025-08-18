@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Lint
+        run: npm run ci:lint
+      - name: Start daemon
+        run: node ./daemon/src/index.js &
+      - name: Wait for daemon
+        run: |
+          for i in {1..20}; do curl -fsS http://127.0.0.1:8787/health && break; sleep 1; done
+      - name: Run tests
+        run: npm run ci:test
+      - name: Smoke docs
+        run: ./scripts/ci-smoke.sh
+      - name: Upload cache artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grail-cache
+          path: .grail-cache/**/*
+
