@@ -8,6 +8,10 @@ Install locally (expose commands on PATH):
 ```
 ./scripts/install-local.sh
 export PATH="$HOME/.local/bin:$PATH"
+
+# Initialize onboarding files in your project
+grail init --pretty
+cat GRAIL_INIT.md
 ```
 
 - Sessions & QA scripts:

@@ -42,6 +42,7 @@ Operational
 - Soak/hardening: 24h daemon uptime check, memory profiling, crash auto-restart
  - Self-describing CLI: help/version/manifest (done)
  - Local installer script to expose commands on PATH (done)
+ - CLI: init command that writes GRAIL_INIT.md + grail.manifest.json (done)
 
 Later
 - PDF rendering option

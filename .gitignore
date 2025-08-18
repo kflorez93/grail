@@ -47,3 +47,4 @@ playwright/.cache/
 
 # Ignore cache artifacts for git
 .grail-cache/
+.docudex-cache/

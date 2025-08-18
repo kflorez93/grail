@@ -342,8 +342,8 @@ function request(method, path, body) {
     let hasPlaywright = false;
     try { await import("playwright"); hasPlaywright = true; } catch (_) { hasPlaywright = false; }
     // Search provider
-    const provider = process.env.DOCUDEX_SEARCH_PROVIDER || "ddg";
-    const providerReady = provider === "ddg" || (provider === "google" && process.env.DOCUDEX_GOOGLE_API_KEY && process.env.DOCUDEX_GOOGLE_CX);
+    const provider = process.env.GRAIL_SEARCH_PROVIDER || "ddg";
+    const providerReady = provider === "ddg" || (provider === "google" && process.env.GRAIL_GOOGLE_API_KEY && process.env.GRAIL_GOOGLE_CX);
     const out = {
       schema_version: "0.1.0",
       doctor: {
@@ -355,6 +355,56 @@ function request(method, path, body) {
     };
     console.log(JSON.stringify(out, null, pretty ? 2 : 0));
     process.exit(out.doctor.daemon.ok ? 0 : 1);
+  } else if (cmd === "init") {
+    const { flags } = parseFlags(process.argv.slice(3));
+    const pretty = Boolean(flags.pretty || flags.json || flags.j);
+    // Gather doctor info
+    let health = null;
+    try {
+      const res = await request("GET", "/health");
+      health = { ok: res.statusCode === 200, raw: JSON.parse(res.body) };
+    } catch (_) { health = { ok: false, raw: null }; }
+    const hasTmux = spawnSync("tmux", ["-V"], { stdio: "ignore" }).status === 0;
+    const hasWatchexec = spawnSync("watchexec", ["--version"], { stdio: "ignore" }).status === 0;
+    const hasEntr = spawnSync("entr", ["-v"], { stdio: "ignore" }).status === 0;
+    let hasPlaywright = false; try { await import("playwright"); hasPlaywright = true; } catch (_) {}
+    const provider = process.env.GRAIL_SEARCH_PROVIDER || "ddg";
+    const providerReady = provider === "ddg" || (provider === "google" && process.env.GRAIL_GOOGLE_API_KEY && process.env.GRAIL_GOOGLE_CX);
+
+    // Build manifest
+    const manifest = {
+      name: "grail",
+      version: VERSION,
+      description: "Grail: research & QA toolkit for terminal AIs",
+      commands: [
+        { name: "health", outputs: "JSON", desc: "Daemon health" },
+        { name: "render", args: ["url", "outDir?"], flags: ["wait-strategy", "wait-selector", "wait-ms", "pretty"], outputs: "JSON" },
+        { name: "extract", args: ["file|url", "outDir?"], flags: ["wait-strategy", "wait-selector", "wait-ms", "pretty"], outputs: "JSON" },
+        { name: "search", args: ["query"], flags: ["site", "n"], outputs: "JSONL" },
+        { name: "pick", args: ["query"], flags: ["site", "n"], outputs: "JSONL" },
+        { name: "docs", args: ["topic"], flags: ["site", "n", "pretty"], outputs: "JSON" },
+        { name: "doctor", outputs: "JSON", desc: "Environment check" },
+        { name: "init", outputs: "files+JSON", desc: "Generate onboarding guide in project" }
+      ],
+      env: {
+        GRAIL_CACHE_DIR: ".grail-cache (default)",
+        GRAIL_MAX_PARALLEL: "4 (default)",
+        GRAIL_RPS: "4 (default)",
+        GRAIL_CACHE_MAX_RUNS: "100 (default)",
+        GRAIL_DISABLE_BROWSER: "unset by default",
+        GRAIL_SEARCH_PROVIDER: "ddg|google",
+        GRAIL_GOOGLE_API_KEY: "required if provider=google",
+        GRAIL_GOOGLE_CX: "required if provider=google"
+      }
+    };
+
+    // Write onboarding guide
+    const md = `# Grail Init\n\nGrail is a CLI-first research & QA toolkit for terminal AIs.\n\n## Quick start\n\n- Start daemon in a long-lived shell:\n\n\`node ./daemon/src/index.js\`\n\n- Health:\n\n\`grail health --pretty\`\n\n- Docs bundle (example):\n\n\`grail docs \"nextjs static generation\" --site vercel.com --n 3 --pretty\`\n\n- Sessions & QA:\n\n\`./scripts/ai-session new server \"pnpm dev\"\`\n\n\`./scripts/ai-watch src \"pytest -q\"\`\n\n\`./scripts/ai-status\`\n\n## Environment\n\n- Playwright: ${hasPlaywright ? "installed" : "missing"}\n- tmux: ${hasTmux ? "installed" : "missing"}\n- watcher (watchexec/entr): ${hasWatchexec || hasEntr ? "available" : "missing"}\n- search provider: ${provider} (${providerReady ? "ready" : "not configured"})\n\n## Commands\n\n${manifest.commands.map(c=>`- ${c.name}: ${c.desc||""}`).join("\n")}\n\n## Files\n\n- This guide: GRAIL_INIT.md\n- Manifest: grail.manifest.json\n`;
+    fs.writeFileSync("GRAIL_INIT.md", md, "utf8");
+    fs.writeFileSync("grail.manifest.json", JSON.stringify(manifest, null, 2), "utf8");
+    const output = { wrote: [ "GRAIL_INIT.md", "grail.manifest.json" ], doctor: { daemon: health, tools: { tmux: hasTmux, watchexec: hasWatchexec, entr: hasEntr }, playwright: hasPlaywright, search: { provider, ready: providerReady } } };
+    console.log(JSON.stringify(output, null, pretty ? 2 : 0));
+    process.exit(0);
   } else if (cmd === "version" || cmd === "--version" || cmd === "-v") {
     console.log(VERSION);
     process.exit(0);
@@ -377,14 +427,14 @@ function request(method, path, body) {
       ],
       scripts: ["ai-session", "ai-watch", "ai-status", "ai-tree"],
       env: {
-        DOCUDEX_CACHE_DIR: ".docudex-cache (default)",
-        DOCUDEX_MAX_PARALLEL: "4 (default)",
-        DOCUDEX_RPS: "4 (default)",
-        DOCUDEX_CACHE_MAX_RUNS: "100 (default)",
-        DOCUDEX_DISABLE_BROWSER: "unset by default",
-        DOCUDEX_SEARCH_PROVIDER: "ddg|google",
-        DOCUDEX_GOOGLE_API_KEY: "required if provider=google",
-        DOCUDEX_GOOGLE_CX: "required if provider=google"
+        GRAIL_CACHE_DIR: ".grail-cache (default)",
+        GRAIL_MAX_PARALLEL: "4 (default)",
+        GRAIL_RPS: "4 (default)",
+        GRAIL_CACHE_MAX_RUNS: "100 (default)",
+        GRAIL_DISABLE_BROWSER: "unset by default",
+        GRAIL_SEARCH_PROVIDER: "ddg|google",
+        GRAIL_GOOGLE_API_KEY: "required if provider=google",
+        GRAIL_GOOGLE_CX: "required if provider=google"
       },
       schemas: {
         render: { schema_version: "string", url: "string", title: "string", final_html: "abs path", screenshot: "abs path?" },
