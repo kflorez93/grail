@@ -38,6 +38,8 @@ Operational
 - Dependencies: Node 20+, Playwright install, tmux, watchexec/entr, jq
 - Security & compliance: identify User-Agent, obey robots where practical, 429 backoff & retries with jitter
 - Soak/hardening: 24h daemon uptime check, memory profiling, crash auto-restart
+ - Self-describing CLI: help/version/manifest (done)
+ - Local installer script to expose commands on PATH (done)
 
 Later
 - PDF rendering option

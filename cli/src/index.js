@@ -4,6 +4,7 @@ import https from "node:https";
 import fs from "node:fs";
 import path from "node:path";
 
+const VERSION = "0.1.0";
 const cmd = process.argv[2] || "health";
 
 function parseFlags(argv) {
@@ -165,6 +166,10 @@ function request(method, path, body) {
 
 (async () => {
   if (cmd === "health") {
+    if (["--help", "-h"].includes(process.argv[3] || "")) {
+      console.log("Usage: docudex health [--json|--pretty]");
+      process.exit(0);
+    }
     try {
       const res = await request("GET", "/health");
       const { flags } = parseFlags(process.argv.slice(3));
@@ -176,6 +181,10 @@ function request(method, path, body) {
     }
   } else if (cmd === "render") {
     const { args, flags } = parseFlags(process.argv.slice(3));
+    if (flags.h || flags.help) {
+      console.log("Usage: docudex render <url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
+      process.exit(0);
+    }
     const url = args[0];
     if (!url) {
       console.error("Usage: docudex render <url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
@@ -198,6 +207,10 @@ function request(method, path, body) {
     }
   } else if (cmd === "extract") {
     const { args, flags } = parseFlags(process.argv.slice(3));
+    if (flags.h || flags.help) {
+      console.log("Usage: docudex extract <file|url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
+      process.exit(0);
+    }
     const input = args[0];
     if (!input) {
       console.error("Usage: docudex extract <file|url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
@@ -229,6 +242,10 @@ function request(method, path, body) {
     }
   } else if (cmd === "search") {
     const { args, flags } = parseFlags(process.argv.slice(3));
+    if (flags.h || flags.help) {
+      console.log("Usage: docudex search <query> [--site <domain>] [--n <int>]");
+      process.exit(0);
+    }
     const query = args.join(" ");
     if (!query) {
       console.error("Usage: docudex search <query> [--site <domain>] [--n <int>]");
@@ -241,6 +258,10 @@ function request(method, path, body) {
     process.exit(0);
   } else if (cmd === "pick") {
     const { args, flags } = parseFlags(process.argv.slice(3));
+    if (flags.h || flags.help) {
+      console.log("Usage: docudex pick <query> --prefer official [--site <domain>] [--n <int>]");
+      process.exit(0);
+    }
     const query = args.join(" ");
     if (!query) {
       console.error("Usage: docudex pick <query> --prefer official [--site <domain>] [--n <int>]");
@@ -258,6 +279,10 @@ function request(method, path, body) {
     process.exit(0);
   } else if (cmd === "docs") {
     const { args, flags } = parseFlags(process.argv.slice(3));
+    if (flags.h || flags.help) {
+      console.log("Usage: docudex docs <topic> --site <domain> [--path <path>] [--n <int>] [--json|--pretty]");
+      process.exit(0);
+    }
     const topic = args.join(" ");
     if (!topic) {
       console.error("Usage: docudex docs <topic> --site <domain> [--path <path>] [--n <int>] [--json|--pretty]");
@@ -294,6 +319,53 @@ function request(method, path, body) {
     fs.writeFileSync(bundlePath, JSON.stringify(bundle, null, 2), "utf8");
     const output = { bundle_json: ensureAbsolute(bundlePath) };
     console.log(JSON.stringify(output, null, (flags.pretty || flags.json || flags.j) ? 2 : 0));
+    process.exit(0);
+  } else if (cmd === "version" || cmd === "--version" || cmd === "-v") {
+    console.log(VERSION);
+    process.exit(0);
+  } else if (cmd === "help" || cmd === "--help" || cmd === "-h") {
+    const help = `docudex ${VERSION}\n\nCommands:\n  health [--pretty]\n  render <url> [outDir] [--wait-...]\n  extract <file|url> [outDir] [--wait-...]\n  search <query> [--site <domain>] [--n <int>]\n  pick <query> --prefer official [--site <domain>] [--n <int>]\n  docs <topic> --site <domain> [--n <int>] [--pretty]\n  version\n  help\n`;
+    console.log(help);
+    process.exit(0);
+  } else if (cmd === "manifest") {
+    const manifest = {
+      name: "docudex",
+      version: VERSION,
+      description: "CLI-first research & QA toolkit for terminal AIs",
+      commands: [
+        { name: "health", outputs: "JSON", desc: "Daemon health" },
+        { name: "render", args: ["url", "outDir?"], flags: ["wait-strategy", "wait-selector", "wait-ms", "pretty"], outputs: "JSON" },
+        { name: "extract", args: ["file|url", "outDir?"], flags: ["wait-strategy", "wait-selector", "wait-ms", "pretty"], outputs: "JSON" },
+        { name: "search", args: ["query"], flags: ["site", "n"], outputs: "JSONL" },
+        { name: "pick", args: ["query"], flags: ["site", "n"], outputs: "JSONL" },
+        { name: "docs", args: ["topic"], flags: ["site", "n", "pretty"], outputs: "JSON" },
+      ],
+      scripts: ["ai-session", "ai-watch", "ai-status", "ai-tree"],
+      env: {
+        DOCUDEX_CACHE_DIR: ".docudex-cache (default)",
+        DOCUDEX_MAX_PARALLEL: "4 (default)",
+        DOCUDEX_RPS: "4 (default)",
+        DOCUDEX_CACHE_MAX_RUNS: "100 (default)",
+        DOCUDEX_DISABLE_BROWSER: "unset by default",
+        DOCUDEX_SEARCH_PROVIDER: "ddg|google",
+        DOCUDEX_GOOGLE_API_KEY: "required if provider=google",
+        DOCUDEX_GOOGLE_CX: "required if provider=google"
+      },
+      schemas: {
+        render: { schema_version: "string", url: "string", title: "string", final_html: "abs path", screenshot: "abs path?" },
+        extract: { schema_version: "string", readable_txt: "abs path", meta_json: "abs path" },
+        batch: { schema_version: "string", results: "array of render or error" },
+        docs: { bundle_json: "abs path" },
+        status: { sessions: "array", watchers: "array", git_diff_stat: "string" }
+      },
+      examples: [
+        "docudex health --pretty",
+        "docudex search 'nextjs static generation' --site vercel.com",
+        "docudex pick 'nextjs static generation' --site vercel.com --n 3",
+        "docudex docs 'nextjs static generation' --site vercel.com --n 3 --pretty"
+      ]
+    };
+    console.log(JSON.stringify(manifest, null, 2));
     process.exit(0);
   } else {
     console.error("Usage: docudex health [--json|--pretty] | docudex render <url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty] | docudex extract <file|url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty] | docudex search <query> [--site <domain>] [--n <int>] | docudex pick <query> --prefer official [--site <domain>] | docudex docs <topic> --site <domain> [--path <path>] [--n <int>] [--json|--pretty]");

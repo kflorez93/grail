@@ -3,6 +3,13 @@ Docudex (placeholder name)
 Minimal scaffold: daemon exposes /health; CLI checks it.
 
 Usage
+Install locally (expose commands on PATH):
+
+```
+./scripts/install-local.sh
+export PATH="$HOME/.local/bin:$PATH"
+```
+
 - Sessions & QA scripts:
 
 ```
