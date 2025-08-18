@@ -86,6 +86,26 @@ function parseDuckDuckGoHtml(html, limit) {
 }
 
 async function providerSearch(query, site, n) {
+  const provider = process.env.DOCUDEX_SEARCH_PROVIDER || "ddg";
+  if (provider === "google" && process.env.DOCUDEX_GOOGLE_API_KEY && process.env.DOCUDEX_GOOGLE_CX) {
+    try {
+      const params = new URLSearchParams({
+        key: process.env.DOCUDEX_GOOGLE_API_KEY,
+        cx: process.env.DOCUDEX_GOOGLE_CX,
+        q: site ? `site:${site} ${query}` : query,
+        num: String(Math.min(10, Math.max(1, n)))
+      });
+      const url = `https://www.googleapis.com/customsearch/v1?${params.toString()}`;
+      const { statusCode, body } = await httpGet(url);
+      if (statusCode >= 200 && statusCode < 300) {
+        const data = JSON.parse(body);
+        const items = Array.isArray(data.items) ? data.items : [];
+        return items.slice(0, n).map(it => ({ title: it.title, url: it.link, snippet: it.snippet || "" }));
+      }
+    } catch (_) {
+      // fall back to ddg below
+    }
+  }
   const encQ = encodeURIComponent(site ? `site:${site} ${query}` : query);
   const url = `https://duckduckgo.com/html/?q=${encQ}`;
   try {

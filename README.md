@@ -45,6 +45,8 @@ Environment
 - `DOCUDEX_RPS`: requests per second rate limit (default 4)
 - `DOCUDEX_CACHE_MAX_RUNS`: max run directories to keep in cache (default 100)
 - `DOCUDEX_DISABLE_BROWSER`: set to `1` to disable Playwright usage
+- `DOCUDEX_SEARCH_PROVIDER`: `ddg` (default) or `google`
+- `DOCUDEX_GOOGLE_API_KEY` and `DOCUDEX_GOOGLE_CX`: set both to enable Google Custom Search provider
 
 Install Playwright to enable browser rendering:
 
