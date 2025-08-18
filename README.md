@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="branding/grail_logo_dark.png" />
+    <img alt="Grail" src="branding/grail_logo.png" width="360" />
+  </picture>
+</p>
+
 Grail
 
 Minimal scaffold: daemon exposes /health; CLI checks it.
@@ -27,7 +34,7 @@ cat GRAIL_INIT.md
 ./scripts/ai-tree --max-depth 3 --json
 ```
 
-Watchers are registered under `.docudex-cache/watchers/*.json` and reported by `ai-status`.
+Watchers are registered under `.grail-cache/watchers/*.json` and reported by `ai-status`.
 
 - Start daemon:
 
