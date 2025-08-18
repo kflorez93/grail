@@ -16,7 +16,7 @@ Research & QA toolkit for terminal AIs. Daemon provides headless browser + extra
 
 ## Requirements
 
-- Node.js 20+
+- Node.js 20+ (tested on Linux x64 and macOS, including Apple Silicon/ARM64)
 - Optional: Playwright for browser rendering/screenshots
 
 ## Installation
