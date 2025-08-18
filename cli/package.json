@@ -4,5 +4,13 @@
   "version": "0.0.1",
   "type": "module",
   "bin": { "docudex": "./src/index.js" },
-  "scripts": { "start": "node ./src/index.js health" }
+  "scripts": {
+    "start": "node ./src/index.js health",
+    "health": "node ./src/index.js health --pretty",
+    "render": "node ./src/index.js render",
+    "extract": "node ./src/index.js extract",
+    "search": "node ./src/index.js search",
+    "pick": "node ./src/index.js pick",
+    "docs": "node ./src/index.js docs"
+  }
 }

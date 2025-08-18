@@ -4,5 +4,9 @@
   "version": "0.0.1",
   "type": "module",
   "bin": { "docudexd": "./src/index.js" },
-  "scripts": { "start": "node ./src/index.js" }
+  "scripts": {
+    "start": "node ./src/index.js",
+    "dev": "PORT=8787 node ./src/index.js",
+    "dev2": "PORT=8788 node ./src/index.js"
+  }
 }
