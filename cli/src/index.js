@@ -3,6 +3,7 @@ import http from "node:http";
 import https from "node:https";
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 
 const VERSION = "0.1.0";
 const cmd = process.argv[2] || "health";
@@ -320,6 +321,38 @@ function request(method, path, body) {
     const output = { bundle_json: ensureAbsolute(bundlePath) };
     console.log(JSON.stringify(output, null, (flags.pretty || flags.json || flags.j) ? 2 : 0));
     process.exit(0);
+  } else if (cmd === "doctor") {
+    const { flags } = parseFlags(process.argv.slice(3));
+    const pretty = Boolean(flags.pretty || flags.json || flags.j);
+    // Daemon health
+    let health = null;
+    try {
+      const res = await request("GET", "/health");
+      health = { ok: res.statusCode === 200, raw: JSON.parse(res.body) };
+    } catch (_) {
+      health = { ok: false, raw: null };
+    }
+    // Tools
+    const hasTmux = spawnSync("tmux", ["-V"], { stdio: "ignore" }).status === 0;
+    const hasWatchexec = spawnSync("watchexec", ["--version"], { stdio: "ignore" }).status === 0;
+    const hasEntr = spawnSync("entr", ["-v"], { stdio: "ignore" }).status === 0;
+    // Playwright
+    let hasPlaywright = false;
+    try { await import("playwright"); hasPlaywright = true; } catch (_) { hasPlaywright = false; }
+    // Search provider
+    const provider = process.env.DOCUDEX_SEARCH_PROVIDER || "ddg";
+    const providerReady = provider === "ddg" || (provider === "google" && process.env.DOCUDEX_GOOGLE_API_KEY && process.env.DOCUDEX_GOOGLE_CX);
+    const out = {
+      schema_version: "0.1.0",
+      doctor: {
+        daemon: health,
+        tools: { tmux: hasTmux, watchexec: hasWatchexec, entr: hasEntr },
+        playwright: hasPlaywright,
+        search: { provider, ready: Boolean(providerReady) }
+      }
+    };
+    console.log(JSON.stringify(out, null, pretty ? 2 : 0));
+    process.exit(out.doctor.daemon.ok ? 0 : 1);
   } else if (cmd === "version" || cmd === "--version" || cmd === "-v") {
     console.log(VERSION);
     process.exit(0);

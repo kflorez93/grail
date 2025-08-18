@@ -35,6 +35,7 @@ node ./daemon/src/index.js
 
 ```
 node ./cli/src/index.js health --pretty
+node ./cli/src/index.js doctor --pretty
 ```
 
 - Render a URL (writes final.html and page.png to cache dir):
