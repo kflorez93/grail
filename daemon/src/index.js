@@ -3,6 +3,8 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { JSDOM } from "jsdom";
+import { Readability } from "@mozilla/readability";
 
 const port = process.env.PORT ? Number(process.env.PORT) : 8787;
 const schemaVersion = "0.1.0";
@@ -59,11 +61,28 @@ function readBody(req) {
   });
 }
 
-async function renderUrlWithPlaywright(pw, url, wait) {
+let pwModule;
+let sharedBrowser = null;
+async function getPlaywright() {
+  if (!pwModule && !process.env.DOCUDEX_DISABLE_BROWSER) {
+    try { pwModule = await import("playwright"); } catch (_) { pwModule = null; }
+  }
+  return pwModule;
+}
+
+async function getBrowser() {
+  const pw = await getPlaywright();
+  if (!pw) return null;
+  if (!sharedBrowser) {
+    sharedBrowser = await pw.chromium.launch({ headless: true });
+  }
+  return sharedBrowser;
+}
+
+async function renderUrlWithPlaywright(browser, url, wait) {
   const waitStrategy = (wait && wait.strategy) || "networkidle";
   let lastErr;
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    const browser = await pw.chromium.launch({ headless: true });
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
     try {
@@ -75,10 +94,10 @@ async function renderUrlWithPlaywright(pw, url, wait) {
       }
       const title = await page.title();
       const html = await page.content();
-      return { browser, ctx, page, title, html };
+      return { ctx, page, title, html };
     } catch (err) {
       lastErr = err;
-      try { await ctx.close(); await browser.close(); } catch (_) {}
+      try { await ctx.close(); } catch (_) {}
       const backoff = 300 + Math.floor(Math.random() * 300) * (attempt + 1);
       await sleep(backoff);
     }
@@ -126,16 +145,13 @@ async function performRender(payload) {
   const wait = payload.wait || undefined;
   if (!url) { const err = new Error("url is required"); err.code = 400; throw err; }
 
-  let pw;
-  if (!process.env.DOCUDEX_DISABLE_BROWSER) {
-    try { pw = await import("playwright"); } catch (e) {}
-  }
-  if (!pw) { const err = new Error("playwright not installed"); err.code = 501; throw err; }
+  const browser = await getBrowser();
+  if (!browser) { const err = new Error("playwright not installed"); err.code = 501; throw err; }
 
   await acquireSlot();
   await rateLimit();
   try {
-    const { browser, ctx, page, title, html } = await renderUrlWithPlaywright(pw, url, wait);
+    const { ctx, page, title, html } = await renderUrlWithPlaywright(browser, url, wait);
     const baseDir = outDir || cacheBaseEnv;
     const runDir = ensureRunDir(baseDir);
     const finalHtmlPath = path.join(runDir, "final.html");
@@ -145,7 +161,7 @@ async function performRender(payload) {
       screenshotPath = path.join(runDir, "page.png");
       await page.screenshot({ path: screenshotPath, fullPage: true });
     } catch (_) { screenshotPath = ""; }
-    try { await ctx.close(); await browser.close(); } catch (_) {}
+    try { await ctx.close(); } catch (_) {}
     pruneCacheRuns(baseDir);
     return {
       schema_version: schemaVersion,
@@ -229,14 +245,13 @@ async function handleExtract(req, res) {
 
     // Lazy import Playwright if url provided
     if (!html && url && !process.env.DOCUDEX_DISABLE_BROWSER) {
-      let pw;
-      try { pw = await import("playwright"); } catch (e) {}
-      if (!pw) { return json(res, 501, { error: "playwright not installed", hint: "npm i -D playwright && npx playwright install", url }); }
+      const browser = await getBrowser();
+      if (!browser) { return json(res, 501, { error: "playwright not installed", hint: "npm i -D playwright && npx playwright install", url }); }
       await acquireSlot();
       await rateLimit();
-      const { browser, ctx, page, html: pageHtml } = await renderUrlWithPlaywright(pw, url, wait);
+      const { ctx, page, html: pageHtml } = await renderUrlWithPlaywright(browser, url, wait);
       html = pageHtml;
-      try { await ctx.close(); await browser.close(); } catch (_) {}
+      try { await ctx.close(); } catch (_) {}
       releaseSlot();
     }
 
@@ -246,8 +261,38 @@ async function handleExtract(req, res) {
     const runDir = ensureRunDir(baseDir);
     const readablePath = path.join(runDir, "readable.txt");
     const metaPath = path.join(runDir, "meta.json");
-    const text = extractPlainText(html);
-    const meta = collectBasicMeta(html, effectiveUrl || undefined);
+    // Use Readability when possible
+    let text = "";
+    let meta = {};
+    try {
+      const dom = new JSDOM(html, { url: effectiveUrl || undefined });
+      const reader = new Readability(dom.window.document);
+      const article = reader.parse();
+      text = (article && article.textContent) ? article.textContent : extractPlainText(html);
+      const doc = dom.window.document;
+      const canonicalEl = doc.querySelector("link[rel=canonical]");
+      const canonical = canonicalEl ? canonicalEl.href : undefined;
+      const headings = Array.from(doc.querySelectorAll("h1, h2, h3, h4, h5, h6")).map(h => ({ level: h.tagName.toLowerCase(), text: h.textContent.trim() }));
+      const links = Array.from(doc.querySelectorAll("a[href]"))
+        .map(a => ({ href: a.getAttribute("href"), text: (a.textContent || "").trim() }))
+        .filter(l => l.href && !l.href.startsWith("#"));
+      const codeBlocks = Array.from(doc.querySelectorAll("pre code, code"))
+        .slice(0, 20)
+        .map(c => (c.textContent || "").trim())
+        .filter(Boolean);
+      meta = {
+        title: (article && article.title) || doc.title || "",
+        url: effectiveUrl || undefined,
+        canonical,
+        headings,
+        links,
+        code_blocks: codeBlocks,
+        collected_at: new Date().toISOString()
+      };
+    } catch (_) {
+      text = extractPlainText(html);
+      meta = collectBasicMeta(html, effectiveUrl || undefined);
+    }
     fs.writeFileSync(readablePath, text, "utf8");
     fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2), "utf8");
     pruneCacheRuns(baseDir);

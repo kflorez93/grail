@@ -23,6 +23,8 @@ MVP 0.3
 - Heuristics for official docs detection and ranking (basic)
 - Cleanup policy for cache directory (done)
 - Robust timeouts, retries, backoff for transient errors (basic retry/backoff implemented)
+ - Persistent browser pool (done)
+ - Readability + JSDOM extraction (done)
 
 Sessions/QA (Phase 2)
 - Scripts: ai-session (tmux wrapper) new|list|logs|kill (basic; requires tmux)
