@@ -1,0 +1,8 @@
+{
+  "name": "docudex-daemon",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "bin": { "docudexd": "./src/index.js" },
+  "scripts": { "start": "node ./src/index.js" }
+}

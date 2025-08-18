@@ -1,0 +1,46 @@
+# OS
+.DS_Store
+
+# Node
+node_modules/
+.pnpm-store/
+.npm/
+
+# Build artifacts
+build/
+dist/
+out/
+.tmp/
+tmp/
+.cache/
+.ai-cache/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Editors/IDE
+.vscode/
+.idea/
+
+# Playwright/Browser
+playwright/.cache/
+
+# Misc
+.eslintcache
+.turbo/
+.next/
+.vercel/
