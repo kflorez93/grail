@@ -16,13 +16,13 @@ MVP 0.2
 - Cache dir management and absolute artifact paths; begin versioned JSON schema (done)
 
 MVP 0.3
-- Daemon: batch endpoint
+- Daemon: batch endpoint (done)
 - CLI: search "<query>" [--site ...] → JSONL results (provider stub)
 - CLI: pick "<query>" --prefer official (heuristics)
 - CLI: docs flow (search → pick → render) emits bundle.json (defined schema)
 - Heuristics for official docs detection and ranking
-- Cleanup policy for cache directory
-- Robust timeouts, retries, backoff for transient errors
+- Cleanup policy for cache directory (done)
+- Robust timeouts, retries, backoff for transient errors (basic retry/backoff implemented)
 
 Sessions/QA (Phase 2)
 - Scripts: ai-session (tmux wrapper) new|list|logs|kill

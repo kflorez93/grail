@@ -9,6 +9,7 @@ const schemaVersion = "0.1.0";
 const maxParallel = Number(process.env.DOCUDEX_MAX_PARALLEL || 4);
 const requestsPerSecond = Number(process.env.DOCUDEX_RPS || 4);
 const cacheBaseEnv = process.env.DOCUDEX_CACHE_DIR || ".docudex-cache";
+const maxCacheRuns = Number(process.env.DOCUDEX_CACHE_MAX_RUNS || 100);
 
 let activeRequests = 0;
 const pendingQueue = [];
@@ -59,25 +60,30 @@ function readBody(req) {
 }
 
 async function renderUrlWithPlaywright(pw, url, wait) {
-  const browser = await pw.chromium.launch({ headless: true });
-  const ctx = await browser.newContext();
-  const page = await ctx.newPage();
   const waitStrategy = (wait && wait.strategy) || "networkidle";
-  try {
-    await page.goto(url, { waitUntil: ["networkidle", "load", "domcontentloaded"].includes(waitStrategy) ? "networkidle" : "load", timeout: 30000 });
-    if (waitStrategy === "selector" && wait && wait.selector) {
-      await page.waitForSelector(wait.selector, { timeout: 10000 });
-    } else if (waitStrategy === "timeout" && wait && typeof wait.ms === "number") {
-      await sleep(Math.max(0, wait.ms));
+  let lastErr;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const browser = await pw.chromium.launch({ headless: true });
+    const ctx = await browser.newContext();
+    const page = await ctx.newPage();
+    try {
+      await page.goto(url, { waitUntil: ["networkidle", "load", "domcontentloaded"].includes(waitStrategy) ? "networkidle" : "load", timeout: 30000 });
+      if (waitStrategy === "selector" && wait && wait.selector) {
+        await page.waitForSelector(wait.selector, { timeout: 10000 });
+      } else if (waitStrategy === "timeout" && wait && typeof wait.ms === "number") {
+        await sleep(Math.max(0, wait.ms));
+      }
+      const title = await page.title();
+      const html = await page.content();
+      return { browser, ctx, page, title, html };
+    } catch (err) {
+      lastErr = err;
+      try { await ctx.close(); await browser.close(); } catch (_) {}
+      const backoff = 300 + Math.floor(Math.random() * 300) * (attempt + 1);
+      await sleep(backoff);
     }
-    const title = await page.title();
-    const html = await page.content();
-    return { browser, ctx, page, title, html };
-  } catch (err) {
-    await ctx.close();
-    await browser.close();
-    throw err;
   }
+  throw lastErr || new Error("render failed after retries");
 }
 
 function ensureAbsolute(p) {
@@ -92,63 +98,81 @@ function ensureRunDir(baseDir) {
   return runDir;
 }
 
-async function handleRender(req, res) {
+function pruneCacheRuns(baseDir) {
   try {
-    const bodyRaw = await readBody(req);
-    let payload = {};
-    try { payload = bodyRaw ? JSON.parse(bodyRaw) : {}; } catch (_) {}
-    const url = (payload.url || "").trim();
-    const outDir = (payload.outDir || "").trim();
-    const wait = payload.wait || undefined;
-    if (!url) { return json(res, 400, { error: "url is required" }); }
-
-    // Lazy import Playwright if available
-    let pw;
-    if (!process.env.DOCUDEX_DISABLE_BROWSER) {
+    const absBase = ensureAbsolute(baseDir);
+    if (!fs.existsSync(absBase)) return;
+    const entries = fs.readdirSync(absBase, { withFileTypes: true })
+      .filter(e => e.isDirectory())
+      .map(e => {
+        const p = path.join(absBase, e.name);
+        const stat = fs.statSync(p);
+        return { path: p, mtimeMs: stat.mtimeMs };
+      })
+      .sort((a, b) => b.mtimeMs - a.mtimeMs);
+    if (entries.length <= maxCacheRuns) return;
+    const toDelete = entries.slice(maxCacheRuns);
+    toDelete.forEach(e => {
       try {
-        // eslint-disable-next-line import/no-extraneous-dependencies
-        pw = await import("playwright");
-      } catch (e) {
-        // not installed; fall through to 501
-      }
-    }
+        fs.rmSync(e.path, { recursive: true, force: true });
+      } catch (_) {}
+    });
+  } catch (_) {}
+}
 
-    if (!pw) {
-      return json(res, 501, { error: "playwright not installed", hint: "npm i -D playwright && npx playwright install", url });
-    }
+async function performRender(payload) {
+  const url = (payload.url || "").trim();
+  const outDir = (payload.outDir || "").trim();
+  const wait = payload.wait || undefined;
+  if (!url) { const err = new Error("url is required"); err.code = 400; throw err; }
 
-    await acquireSlot();
-    await rateLimit();
+  let pw;
+  if (!process.env.DOCUDEX_DISABLE_BROWSER) {
+    try { pw = await import("playwright"); } catch (e) {}
+  }
+  if (!pw) { const err = new Error("playwright not installed"); err.code = 501; throw err; }
+
+  await acquireSlot();
+  await rateLimit();
+  try {
     const { browser, ctx, page, title, html } = await renderUrlWithPlaywright(pw, url, wait);
-
-    // Write artifacts
     const baseDir = outDir || cacheBaseEnv;
     const runDir = ensureRunDir(baseDir);
     const finalHtmlPath = path.join(runDir, "final.html");
     fs.writeFileSync(finalHtmlPath, html, "utf8");
-
-    // optional screenshot
     let screenshotPath = "";
     try {
       screenshotPath = path.join(runDir, "page.png");
       await page.screenshot({ path: screenshotPath, fullPage: true });
-    } catch (_) {
-      screenshotPath = "";
-    }
-
-    await ctx.close();
-    await browser.close();
-    releaseSlot();
-
-    return json(res, 200, {
+    } catch (_) { screenshotPath = ""; }
+    try { await ctx.close(); await browser.close(); } catch (_) {}
+    pruneCacheRuns(baseDir);
+    return {
       schema_version: schemaVersion,
       url,
       title,
       final_html: ensureAbsolute(finalHtmlPath),
       screenshot: screenshotPath ? ensureAbsolute(screenshotPath) : undefined,
-    });
-  } catch (err) {
+    };
+  } finally {
     releaseSlot();
+  }
+}
+
+async function handleRender(req, res) {
+  try {
+    const bodyRaw = await readBody(req);
+    let payload = {};
+    try { payload = bodyRaw ? JSON.parse(bodyRaw) : {}; } catch (_) {}
+    try {
+      const result = await performRender(payload);
+      return json(res, 200, result);
+    } catch (e) {
+      if (e && e.code === 400) return json(res, 400, { error: e.message });
+      if (e && e.code === 501) return json(res, 501, { error: "playwright not installed", hint: "npm i -D playwright && npx playwright install", url: payload && payload.url });
+      throw e;
+    }
+  } catch (err) {
     return json(res, 500, { error: "render failed", message: String(err && err.message || err) });
   }
 }
@@ -226,6 +250,7 @@ async function handleExtract(req, res) {
     const meta = collectBasicMeta(html, effectiveUrl || undefined);
     fs.writeFileSync(readablePath, text, "utf8");
     fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2), "utf8");
+    pruneCacheRuns(baseDir);
 
     return json(res, 200, {
       schema_version: schemaVersion,
@@ -259,6 +284,44 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/extract") {
     await handleExtract(req, res);
     return;
+  }
+
+  if (req.method === "POST" && req.url === "/batch") {
+    try {
+      const bodyRaw = await readBody(req);
+      let payload = {};
+      try { payload = bodyRaw ? JSON.parse(bodyRaw) : {}; } catch (_) {}
+      const urls = Array.isArray(payload.urls) ? payload.urls : [];
+      const parallel = Number(payload.parallel || maxParallel);
+      const outDir = (payload.outDir || "").trim();
+      const wait = payload.wait || undefined;
+      if (!urls.length) { json(res, 400, { error: "urls is required" }); return; }
+
+      let index = 0;
+      const results = new Array(urls.length);
+      async function worker() {
+        while (true) {
+          const i = index; index += 1;
+          if (i >= urls.length) break;
+          const u = urls[i];
+          try {
+            const r = await performRender({ url: u, outDir, wait });
+            results[i] = r;
+          } catch (e) {
+            if (e && e.code === 501) results[i] = { error: "playwright not installed", url: u };
+            else if (e && e.code === 400) results[i] = { error: e.message, url: u };
+            else results[i] = { error: String(e && e.message || e), url: u };
+          }
+        }
+      }
+      const workers = Array.from({ length: Math.max(1, Math.min(parallel, urls.length)) }, () => worker());
+      await Promise.all(workers);
+      json(res, 200, { schema_version: schemaVersion, results });
+      return;
+    } catch (err) {
+      json(res, 500, { error: "batch failed", message: String(err && err.message || err) });
+      return;
+    }
   }
 
   json(res, 404, { error: "not found" });

@@ -122,8 +122,59 @@ function request(method, path, body) {
       console.error("Error: extract failed");
       process.exit(1);
     }
+  } else if (cmd === "search") {
+    const { args, flags } = parseFlags(process.argv.slice(3));
+    const query = args.join(" ");
+    if (!query) {
+      console.error("Usage: docudex search <query> [--site <domain>] [--n <int>]");
+      process.exit(2);
+    }
+    // Provider stub: DuckDuckGo HTML is not implemented. Emit stub JSONL.
+    const site = flags.site ? String(flags.site) : undefined;
+    const n = Number(flags.n || 5);
+    for (let i = 0; i < n; i += 1) {
+      const url = site ? `https://${site}/docs/example-${i}` : `https://example.com/docs/example-${i}`;
+      const item = { title: `Stub Result ${i + 1} for ${query}`, url, snippet: "provider stub" };
+      console.log(JSON.stringify(item));
+    }
+    process.exit(0);
+  } else if (cmd === "pick") {
+    const { args, flags } = parseFlags(process.argv.slice(3));
+    const query = args.join(" ");
+    if (!query) {
+      console.error("Usage: docudex pick <query> --prefer official [--site <domain>]");
+      process.exit(2);
+    }
+    // Heuristics stub: prefer docs.* or */docs paths
+    const site = flags.site ? String(flags.site) : "example.com";
+    const picks = [
+      { title: `Official docs 1 for ${query}`, url: `https://docs.${site}/guides/${encodeURIComponent(query)}` },
+      { title: `Official docs 2 for ${query}`, url: `https://${site}/docs/${encodeURIComponent(query)}` }
+    ];
+    picks.forEach(p => console.log(JSON.stringify(p)));
+    process.exit(0);
+  } else if (cmd === "docs") {
+    const { args, flags } = parseFlags(process.argv.slice(3));
+    const topic = args.join(" ");
+    if (!topic) {
+      console.error("Usage: docudex docs <topic> --site <domain> [--path <path>] [--n <int>] [--json|--pretty]");
+      process.exit(2);
+    }
+    const site = flags.site ? String(flags.site) : "example.com";
+    const n = Number(flags.n || 3);
+    const outDir = flags.outDir || "";
+    // Compose stub: generate n URLs and call /batch
+    const urls = Array.from({ length: n }, (_, i) => `https://${site}/docs/${encodeURIComponent(topic)}-${i + 1}`);
+    const wait = {};
+    if (flags.waitStrategy) wait.strategy = String(flags.waitStrategy);
+    if (flags.waitSelector) wait.selector = String(flags.waitSelector);
+    if (flags.waitMs) wait.ms = Number(flags.waitMs);
+    const payload = { urls, parallel: flags.parallel ? Number(flags.parallel) : undefined, outDir, wait: Object.keys(wait).length ? wait : undefined };
+    const res = await request("POST", "/batch", payload);
+    printResponse(res.body, Boolean(flags.pretty || flags.json || flags.j));
+    process.exit(res.statusCode === 200 ? 0 : 1);
   } else {
-    console.error("Usage: docudex health [--json|--pretty] | docudex render <url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty] | docudex extract <file|url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty]");
+    console.error("Usage: docudex health [--json|--pretty] | docudex render <url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty] | docudex extract <file|url> [outDir] [--wait-strategy <networkidle|selector|timeout>] [--wait-selector <css>] [--wait-ms <ms>] [--json|--pretty] | docudex search <query> [--site <domain>] [--n <int>] | docudex pick <query> --prefer official [--site <domain>] | docudex docs <topic> --site <domain> [--path <path>] [--n <int>] [--json|--pretty]");
     process.exit(2);
   }
 })();

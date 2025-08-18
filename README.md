@@ -29,12 +29,21 @@ node ./cli/src/index.js extract ./path/to/file.html --pretty
 node ./cli/src/index.js extract "https://example.com/docs" --wait-strategy selector --wait-selector main --pretty
 ```
 
+- Batch/docs workflow (stub search/pick, real batch render):
+
+```
+node ./cli/src/index.js search "nextjs static generation" --site vercel.com
+node ./cli/src/index.js pick "nextjs static generation" --site vercel.com
+node ./cli/src/index.js docs "nextjs static generation" --site vercel.com --n 3 --pretty
+```
+
 Environment
 
 - `PORT`: daemon port (default 8787)
 - `DOCUDEX_CACHE_DIR`: base cache directory (default `.docudex-cache`)
 - `DOCUDEX_MAX_PARALLEL`: concurrent operations (default 4)
 - `DOCUDEX_RPS`: requests per second rate limit (default 4)
+- `DOCUDEX_CACHE_MAX_RUNS`: max run directories to keep in cache (default 100)
 - `DOCUDEX_DISABLE_BROWSER`: set to `1` to disable Playwright usage
 
 Install Playwright to enable browser rendering:
