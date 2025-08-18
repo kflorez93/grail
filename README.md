@@ -1,3 +1,45 @@
 Docudex (placeholder name)
 
 Minimal scaffold: daemon exposes /health; CLI checks it.
+
+Usage
+
+- Start daemon:
+
+```
+node ./daemon/src/index.js
+```
+
+- Health:
+
+```
+node ./cli/src/index.js health --pretty
+```
+
+- Render a URL (writes final.html and page.png to cache dir):
+
+```
+node ./cli/src/index.js render "https://example.com" .docudex-cache --wait-strategy networkidle --pretty
+```
+
+- Extract from a local HTML file or fetch-and-extract from a URL:
+
+```
+node ./cli/src/index.js extract ./path/to/file.html --pretty
+node ./cli/src/index.js extract "https://example.com/docs" --wait-strategy selector --wait-selector main --pretty
+```
+
+Environment
+
+- `PORT`: daemon port (default 8787)
+- `DOCUDEX_CACHE_DIR`: base cache directory (default `.docudex-cache`)
+- `DOCUDEX_MAX_PARALLEL`: concurrent operations (default 4)
+- `DOCUDEX_RPS`: requests per second rate limit (default 4)
+- `DOCUDEX_DISABLE_BROWSER`: set to `1` to disable Playwright usage
+
+Install Playwright to enable browser rendering:
+
+```
+npm i -D playwright
+npx playwright install --with-deps
+```
