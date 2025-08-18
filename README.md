@@ -5,10 +5,6 @@
   </picture>
 </p>
 
-<p align="center">
-  <sub><code>Node 20+</code> • <code>Playwright</code> • <code>Headless Chromium</code> • <code>JSDOM</code> • <code>@mozilla/readability</code> • <code>Rate limiting</code> • <code>JSON/JSONL</code> • <code>CLI-first</code> • <code>ESM</code> • <code>MIT</code> • <code>GitHub Actions</code></sub>
-</p>
-
 Research & QA toolkit for terminal AIs. Daemon provides headless browser + extraction; CLI orchestrates search, docs bundling, and long‑lived sessions.
 
 ## Features
@@ -38,7 +34,7 @@ Initialize onboarding files in your project and teach your agent about Grail:
 
 ```
 grail init --pretty
-cat GRAIL_INIT.md
+a cat GRAIL_INIT.md
 ```
 
 Start daemon in a long‑lived shell:
