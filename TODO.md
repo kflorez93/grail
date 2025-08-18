@@ -17,10 +17,10 @@ MVP 0.2
 
 MVP 0.3
 - Daemon: batch endpoint (done)
-- CLI: search "<query>" [--site ...] → JSONL results (provider stub)
-- CLI: pick "<query>" --prefer official (heuristics)
-- CLI: docs flow (search → pick → render) emits bundle.json (defined schema)
-- Heuristics for official docs detection and ranking
+- CLI: search "<query>" [--site ...] → JSONL results (DuckDuckGo HTML provider)
+- CLI: pick "<query>" --prefer official (heuristics) (basic)
+- CLI: docs flow (search → pick → render) emits bundle.json (done; includes picks + batch results)
+- Heuristics for official docs detection and ranking (basic)
 - Cleanup policy for cache directory (done)
 - Robust timeouts, retries, backoff for transient errors (basic retry/backoff implemented)
 
