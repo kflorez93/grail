@@ -6,8 +6,8 @@ Grail Roadmap – Ordered Checklist
 - [x] Bootstrap Go wrapper (prompt/run) and plugin manifests (web, sessions)
 - [x] Implement prompt aggregation (merge manifests into a single onboarding prompt)
 - [ ] Implement `run` to inject prompt for Cursor; print/copy for other CLIs
-- [ ] Add `plugins list|add|rm` in wrapper (reads/writes `.grail/config.json`)
-- [ ] Load/validate `.grail/config.json` on startup
+- [x] Add `plugins list|add|rm` in wrapper (reads/writes `.grail/config.json`)
+- [x] Load/validate `.grail/config.json` on startup
 - [ ] Secrets store: OS keychain with encrypted file fallback
 - [ ] TUI: `grail config` to toggle plugins and test connections
 
