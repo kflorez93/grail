@@ -369,13 +369,13 @@ function request(method, path, body) {
         const { spawn } = await import("node:child_process");
         const child = spawn(process.execPath, [path.resolve(process.cwd(), "./daemon/src/index.js")], { detached: true, stdio: "ignore" });
         child.unref();
-      } catch (_) {}
+      } catch (_) { /* ignore spawn error */ }
       // Poll for health
       for (let i = 0; i < 20; i += 1) {
         try {
           const res = await request("GET", "/health");
           if (res && res.statusCode === 200) return { attempted: true, started: true };
-        } catch (_) {}
+        } catch (_) { /* not ready yet */ }
         await new Promise(r => setTimeout(r, 250));
       }
       return { attempted: true, started: false };
@@ -385,7 +385,7 @@ function request(method, path, body) {
       // Skip if user opts out or browser disabled
       if (process.env.GRAIL_DISABLE_BROWSER) return { attempted: false, installed: false };
       if (String(process.env.GRAIL_INIT_AUTO_DEPS || "1") === "0") return { attempted: false, installed: false };
-      try { await import("playwright"); return { attempted: false, installed: true }; } catch (_) {}
+      try { await import("playwright"); return { attempted: false, installed: true }; } catch (_) { /* not installed */ }
       // Try to install dev dep and browsers
       try {
         spawnSync("npm", ["i", "-D", "playwright", "--no-fund", "--no-audit"], { stdio: "ignore" });

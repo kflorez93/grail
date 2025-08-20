@@ -21,6 +21,10 @@ type Manifest struct {
     Examples    []string                 `json:"examples"`
 }
 
+type Config struct {
+    Plugins []string `json:"plugins"`
+}
+
 func readJSON(path string, v any) error {
     b, err := os.ReadFile(path)
     if err != nil { return err }
@@ -38,24 +42,70 @@ func mergeManifests(base *Manifest, other *Manifest) *Manifest {
     return &out
 }
 
+func ensureProjectRoot() string {
+    root, _ := os.Getwd()
+    return root
+}
+
+func configPath() string {
+    return filepath.Join(ensureProjectRoot(), ".grail", "config.json")
+}
+
+func readConfig() (*Config, error) {
+    p := configPath()
+    b, err := os.ReadFile(p)
+    if err != nil { return &Config{Plugins: []string{}}, nil }
+    var c Config
+    if err := json.Unmarshal(b, &c); err != nil { return nil, err }
+    if c.Plugins == nil { c.Plugins = []string{} }
+    return &c, nil
+}
+
+func writeConfig(c *Config) error {
+    dir := filepath.Dir(configPath())
+    if err := os.MkdirAll(dir, 0o755); err != nil { return err }
+    b, _ := json.MarshalIndent(c, "", "  ")
+    return os.WriteFile(configPath(), b, 0o644)
+}
+
+func resolvePluginPath(nameOrPath string) (string, error) {
+    if strings.HasSuffix(strings.ToLower(nameOrPath), ".json") {
+        if filepath.IsAbs(nameOrPath) { return nameOrPath, nil }
+        return filepath.Join(ensureProjectRoot(), nameOrPath), nil
+    }
+    cand := filepath.Join(ensureProjectRoot(), "plugins", nameOrPath+".json")
+    return cand, nil
+}
+
 func loadAggregatedManifest() (*Manifest, error) {
     var agg Manifest
     // Base project manifest
     if err := readJSON("grail.manifest.json", &agg); err != nil {
         agg = Manifest{}
     }
-    // Plugin manifests under plugins/*.json (optional)
-    filepath.WalkDir("plugins", func(path string, d fs.DirEntry, err error) error {
-        if err != nil { return nil }
-        if d.IsDir() { return nil }
-        if !strings.HasSuffix(strings.ToLower(d.Name()), ".json") { return nil }
-        var m Manifest
-        if readJSON(path, &m) == nil {
-            tmp := mergeManifests(&agg, &m)
-            agg = *tmp
+    if cfg, err := readConfig(); err == nil && len(cfg.Plugins) > 0 {
+        for _, entry := range cfg.Plugins {
+            p, _ := resolvePluginPath(entry)
+            var m Manifest
+            if readJSON(p, &m) == nil {
+                tmp := mergeManifests(&agg, &m)
+                agg = *tmp
+            }
         }
-        return nil
-    })
+    } else {
+        // Fallback: scan plugins/*.json
+        filepath.WalkDir("plugins", func(path string, d fs.DirEntry, err error) error {
+            if err != nil { return nil }
+            if d.IsDir() { return nil }
+            if !strings.HasSuffix(strings.ToLower(d.Name()), ".json") { return nil }
+            var m Manifest
+            if readJSON(path, &m) == nil {
+                tmp := mergeManifests(&agg, &m)
+                agg = *tmp
+            }
+            return nil
+        })
+    }
     if len(agg.Commands) == 0 && len(agg.Env) == 0 && len(agg.Schemas) == 0 {
         return nil, errors.New("no manifests found; run 'grail init' first")
     }
@@ -128,9 +178,35 @@ func cmdRun(agent string) error {
     return nil
 }
 
+func cmdPluginsList() error {
+    cfg, err := readConfig()
+    if err != nil { return err }
+    for _, p := range cfg.Plugins { fmt.Println(p) }
+    return nil
+}
+
+func cmdPluginsAdd(name string) error {
+    if name == "" { return errors.New("usage: grailx plugins add <name|path>") }
+    cfg, err := readConfig()
+    if err != nil { return err }
+    for _, p := range cfg.Plugins { if p == name { return nil } }
+    cfg.Plugins = append(cfg.Plugins, name)
+    return writeConfig(cfg)
+}
+
+func cmdPluginsRm(name string) error {
+    if name == "" { return errors.New("usage: grailx plugins rm <name|path>") }
+    cfg, err := readConfig()
+    if err != nil { return err }
+    out := make([]string, 0, len(cfg.Plugins))
+    for _, p := range cfg.Plugins { if p != name { out = append(out, p) } }
+    cfg.Plugins = out
+    return writeConfig(cfg)
+}
+
 func main() {
     if len(os.Args) < 2 {
-        fmt.Println("usage: grailx prompt | grailx run --agent '<command>'")
+        fmt.Println("usage: grailx prompt | grailx run --agent '<command>' | grailx plugins [list|add|rm]")
         os.Exit(2)
     }
     switch os.Args[1] {
@@ -141,8 +217,26 @@ func main() {
         agent := fs.String("agent", "", "Agent command to run")
         _ = fs.Parse(os.Args[2:])
         if err := cmdRun(*agent); err != nil { fmt.Fprintln(os.Stderr, err); os.Exit(1) }
+    case "plugins":
+        if len(os.Args) < 3 { fmt.Println("usage: grailx plugins [list|add|rm]"); os.Exit(2) }
+        sub := os.Args[2]
+        switch sub {
+        case "list":
+            if err := cmdPluginsList(); err != nil { fmt.Fprintln(os.Stderr, err); os.Exit(1) }
+        case "add":
+            name := ""
+            if len(os.Args) > 3 { name = os.Args[3] }
+            if err := cmdPluginsAdd(name); err != nil { fmt.Fprintln(os.Stderr, err); os.Exit(1) }
+        case "rm":
+            name := ""
+            if len(os.Args) > 3 { name = os.Args[3] }
+            if err := cmdPluginsRm(name); err != nil { fmt.Fprintln(os.Stderr, err); os.Exit(1) }
+        default:
+            fmt.Println("usage: grailx plugins [list|add|rm]")
+            os.Exit(2)
+        }
     default:
-        fmt.Println("usage: grailx prompt | grailx run --agent '<command>'")
+        fmt.Println("usage: grailx prompt | grailx run --agent '<command>' | grailx plugins [list|add|rm]")
         os.Exit(2)
     }
 }
