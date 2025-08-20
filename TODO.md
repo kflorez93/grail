@@ -1,63 +1,63 @@
-Grail TODO
+Grail Roadmap & Tasks
 
-MVP 0.1
-- Daemon: /health (done)
-- Daemon: /render (HTML + screenshot, basic) (done)
-- CLI: health (done)
-- CLI: render <url> [outDir] (done)
-- Project: consistent logging, error shapes, JSON schema notes
+Architecture & Planning
+- [ ] Define plugin manifest spec (JSON schema) and JSON I/O contract (stdin/stdout or HTTP)
+- [ ] Define `.grail/config.json` schema (enabled plugins, prefs, endpoints)
 
-MVP 0.2
-- Daemon: extract (Readability + metadata) → readable.txt, meta.json (done)
-- Daemon: configurable wait strategies (networkidle | selector | timeout) (done)
-- Daemon: parallel limit and basic rate limiting (done)
-- CLI: extract <file|url> → calls /extract or /render+extract (done)
-- CLI: JSON output flag passthrough (done)
-- Cache dir management and absolute artifact paths; begin versioned JSON schema (done)
+TypeScript (web daemon)
+- [ ] Migrate daemon to TypeScript (tsconfig, types, build step)
+- [ ] Keep API parity: `/health`, `/render`, `/extract`, `/batch`
+- [ ] ESLint + TS rules aligned with repo
 
-MVP 0.3
-- Daemon: batch endpoint (done)
-- CLI: search "<query>" [--site ...] → JSONL results (DuckDuckGo HTML provider)
-- CLI: pick "<query>" --prefer official (heuristics) (basic)
-- CLI: docs flow (search → pick → render) emits bundle.json (done; includes picks + batch results)
-- Heuristics for official docs detection and ranking (basic)
-- Cleanup policy for cache directory (done)
-- Robust timeouts, retries, backoff for transient errors (basic retry/backoff implemented)
- - Persistent browser pool (done)
- - Readability + JSDOM extraction (done)
+Go Wrapper (core CLI)
+- [ ] Initialize Go module (`grail`) and choose CLI framework (Cobra)
+- [ ] Commands: `prompt`, `run`, `init`, `plugins add|rm|list`, `auth`, `secrets`, `config`, `doctor`
+- [x] Implement prompt aggregation (merge manifests into a single onboarding prompt)
+- [ ] Implement `run` to inject prompt for Cursor; print/copy for other CLIs
+- [ ] Load/validate `.grail/config.json`
+- [ ] Secrets: OS keychain (Keychain/libsecret) with file-based encrypted fallback
+- [ ] TUI (`grail config`) to toggle plugins and test connections
 
-Sessions/QA (Phase 2)
-- Scripts: ai-session (tmux wrapper) new|list|logs|kill (basic; requires tmux)
-- Scripts: ai-watch (watchexec/entr wrapper) (basic)
-- CLI: status snapshot (sessions, diffs) → ai-status (JSON: sessions, watchers, git diff --stat) (basic; reads `.grail-cache/watchers`)
-- Script: ai-tree (project snapshot; text/JSON) (done)
-- ai-session kill: graceful SIGINT → SIGTERM after timeout
+Built-in Plugins
+- Web/Search/Sessions (bridge to TS daemon)
+  - [x] Publish plugin manifest referencing daemon endpoints and schemas
+  - [ ] Health check and error surfacing in wrapper
+- Sessions/Watchers
+  - [ ] Provide Go-backed commands or wrap existing scripts with manifests
 
-Operational
-- Add bun/npm scripts, versioning, release process
-- Config envs (cache dir, headless toggles, concurrency)
-- Basic tests for render/extract
-- Dependencies: Node 20+, Playwright install, tmux, watchexec/entr, jq
-- Security & compliance: identify User-Agent, obey robots where practical, 429 backoff & retries with jitter
-- Soak/hardening: 24h daemon uptime check, memory profiling, crash auto-restart
- - Self-describing CLI: help/version/manifest (done)
- - Local installer script to expose commands on PATH (done)
- - CLI: init command that writes GRAIL_INIT.md + grail.manifest.json (done)
+Linear Plugin (Go)
+- [ ] `grail auth linear` (token entry + secure storage)
+- [ ] Commands: `linear me`, `linear issues`, `linear issue <id>` (read-only first)
+- [ ] Manifest: commands, schemas, examples, “when to use” guidance
 
-Later
-- PDF rendering option
-- Multi-browser support if needed
+Jira Plugin (Go, scaffold)
+- [ ] Config: base URL + token
+- [ ] Stub commands: `jira me`, `jira issue <id>`; manifest + TODOs
 
-CLI/Daemon Contracts
-- Stable, versioned JSON schemas for all command outputs
-- Absolute artifact paths for: final.html, readable.txt, meta.json, page.png (and optional page.pdf)
-- Exit codes: pass-through for watched commands; non-zero on failures; consistent error payloads
+Init & Onboarding
+- [ ] Enhance `grail init` to aggregate all enabled plugin manifests into `grail.manifest.json`
+- [ ] Expand `GRAIL_INIT.md` with plugin-specific “when to use” and examples
 
-Acceptance Criteria (aligns with POK-62 MVP v0.1)
-1. ai-webd stays up for 24h under light load (≤ 1 rps) without memory leaks
-2. ai-web render <vercel-next-doc-url> returns final.html, readable.txt, meta.json, page.png
-3. ai-web docs "<topic>" --site vercel.com produces a bundle.json with ≥3 official doc pages
-4. ai-session new server "pnpm dev" + ai-session logs server shows live server output
-5. ai-watch <dir> "pytest -q" re-runs on file change and exits with correct code
-6. ai-status outputs JSON with sessions and recent git diff --stat
+CI/CD
+- [ ] Extend CI to build/test Go wrapper (Linux/macOS incl. Apple Silicon)
+- [ ] Release: upload Go binaries (darwin/linux, x64/arm64) alongside TS tarballs
+
+Tests & QA
+- [ ] Unit: prompt aggregator (merging manifests) and config loader
+- [ ] Unit: secrets store abstraction
+- [ ] E2E: `grail run` with mocked agent; Linear API calls (token), web docs flow still green
+- [ ] Soak: long-running daemon + wrapper exercising concurrency & pruning
+
+Docs
+- [ ] Wrapper mode docs (how to use with Cursor/Claude CLIs)
+- [ ] Plugin authoring guide (manifest + handler contract)
+- [ ] Auth & secrets guide; environment variables reference
+
+Completed
+- [x] Daemon: graceful shutdown; `/health` includes version+uptime
+- [x] README: OSS sections; light/dark logo
+- [x] CI: Ubuntu+macOS (Apple Silicon); artifact uploads; release assets (darwin/linux x64/arm64)
+- [x] `grail init`: auto-start daemon; auto-install Playwright (opt-outs supported)
+- [x] Default cache retention set to 30 runs; pruning on new runs
+- [x] Bootstrap Go wrapper (prompt/run) and plugin manifests (web, sessions)
 
