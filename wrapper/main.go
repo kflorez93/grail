@@ -1,14 +1,14 @@
 package main
 
 import (
-    "encoding/json"
-    "errors"
-    "flag"
-    "fmt"
-    "io/fs"
-    "os"
-    "path/filepath"
-    "strings"
+	"encoding/json"
+	"errors"
+	"flag"
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 type Manifest struct {

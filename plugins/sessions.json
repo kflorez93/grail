@@ -1,0 +1,23 @@
+{
+  "name": "sessions",
+  "version": "0.1.0",
+  "description": "Long-lived terminal sessions and watchers for dev/test loops (tmux).",
+  "commands": [
+    { "name": "ai-session new <name> \"<cmd>\"", "outputs": "JSON", "desc": "Start a new tmux session running <cmd>" },
+    { "name": "ai-session list", "outputs": "JSON", "desc": "List tmux sessions" },
+    { "name": "ai-session logs <name> [tail]", "outputs": "text", "desc": "Tail recent output from session" },
+    { "name": "ai-session kill <name>", "outputs": "JSON", "desc": "Stop session" },
+    { "name": "ai-watch <dir> \"<cmd>\"", "outputs": "text", "desc": "Run command on file changes" },
+    { "name": "ai-status", "outputs": "JSON", "desc": "Sessions, watchers, git diff --stat" }
+  ],
+  "env": {},
+  "schemas": {
+    "status": { "sessions": "array", "watchers": "array", "git_diff_stat": "string" }
+  },
+  "examples": [
+    "./scripts/ai-session new server 'pnpm dev'",
+    "./scripts/ai-watch src 'pytest -q'",
+    "./scripts/ai-status"
+  ]
+}
+
