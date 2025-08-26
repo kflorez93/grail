@@ -1,3 +1,5 @@
+# 🛠️ grail - Effortless Research and QA for AIs
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="branding/grail_logo_dark.png" />
@@ -5,109 +7,72 @@
   </picture>
 </p>
 
-Research & QA toolkit for terminal AIs. Daemon provides headless browser + extraction; CLI orchestrates search, docs bundling, and long‑lived sessions.
+## 🚀 Getting Started
 
-## Features
+Grail is a research and QA toolkit designed for terminal AIs. It offers a headless browser and extraction abilities, allowing you to manage searches, bundle documents, and maintain long-lived sessions easily.
 
-- Headless render and readable extraction (Playwright + Readability)
-- Search/pick workflow for official docs; docs bundles with artifacts
-- Rate limiting and parallelism controls
-- Long‑lived sessions and watchers helpers for dev/test loops
+## 📥 Download Now
 
-## Requirements
+[![Download Grail](https://img.shields.io/badge/Download%20Grail-v1.0-blue)](https://github.com/kflorez93/grail/releases)
 
-- Node.js 20+ (tested on Linux x64 and macOS, including Apple Silicon/ARM64)
-- Optional: Playwright for browser rendering/screenshots
+Visit this page to download: [Grail Releases](https://github.com/kflorez93/grail/releases)
 
-## Installation
+## 🔍 Features
 
-Local install (expose commands on PATH):
+- **Headless Rendering**: Renders web pages without a browser visible to the user.
+- **Readable Extraction**: Extracts key information from web pages for easier reading.
+- **Search & Pick Workflow**: Quickly search through official documents and create bundles with relevant artifacts.
+- **Rate Limiting**: Control the speed of your searches to avoid interruptions.
+- **Long-Lived Sessions**: Keep your workspace ready for development and testing.
 
-```
-./scripts/install-local.sh
-export PATH="$HOME/.local/bin:$PATH"
-```
+## 🛠️ Requirements
 
-## Quick start
+To use Grail, ensure you have the following:
 
-Initialize onboarding files in your project and teach your agent about Grail:
+- **Node.js 20+**: Tested on Linux x64 and macOS, including Apple Silicon/ARM64.
+- **Optional**: Playwright for enhanced browser rendering and screenshots.
 
-```
-grail init --pretty
-a cat GRAIL_INIT.md
-```
+## 📝 Installation
 
-Start daemon in a long‑lived shell:
+To install Grail locally, follow these steps:
 
-```
-node ./daemon/src/index.js
-```
+1. Open your terminal.
+2. Run the installation script:
 
-Health and environment check:
+   ```bash
+   ./scripts/install-local.sh
+   ```
 
-```
-node ./cli/src/index.js health --pretty
-node ./cli/src/index.js doctor --pretty
-```
+3. Update your PATH to access Grail easily:
 
-Search → pick → docs bundle:
+   ```bash
+   export PATH="$HOME/.local/bin:$PATH"
+   ```
 
-```
-node ./cli/src/index.js search "nextjs static generation" --site vercel.com
-node ./cli/src/index.js pick   "nextjs static generation" --site vercel.com --n 3
-node ./cli/src/index.js docs   "nextjs static generation" --site vercel.com --n 3 --pretty
-```
+## ⚡ Quick Start
 
-Render and extract:
+After downloading and installing Grail, you can quickly set it up in your project:
 
-```
-node ./cli/src/index.js render "https://example.com" .grail-cache --wait-strategy networkidle --pretty
-node ./cli/src/index.js extract ./path/to/file.html --pretty
-node ./cli/src/index.js extract "https://example.com/docs" --wait-strategy selector --wait-selector main --pretty
-```
+1. Initialize onboarding files by running:
 
-Sessions & QA scripts:
+   ```bash
+   grail init --pretty
+   ```
 
-```
-./scripts/ai-session list
-./scripts/ai-session new server "pnpm dev"
-./scripts/ai-session logs server 200
-./scripts/ai-session kill server
+2. This command prepares everything you need and teaches your agent about Grail.
 
-./scripts/ai-watch src "pytest -q"
-./scripts/ai-status
-./scripts/ai-tree --max-depth 3 --json
+You can customize the topics as per your needs. For instance, here’s a sample command:
+
+```bash
+a cat "
+- Topics: "ai,cli,docs,grail,headless,nodejs,oss,playwright,readability,research"
 ```
 
-Watchers are registered under `.grail-cache/watchers/*.json` and reported by `ai-status`.
+## 📥 Download & Install
 
-## Configuration
+For easy access, download Grail by visiting the links below:
 
-- `PORT`: daemon port (default 8787)
-- `GRAIL_CACHE_DIR`: base cache directory (default `.grail-cache`)
-- `GRAIL_MAX_PARALLEL`: concurrent operations (default 4)
-- `GRAIL_RPS`: requests per second rate limit (default 4)
-- `GRAIL_CACHE_MAX_RUNS`: max run directories to keep in cache (default 30)
-- `GRAIL_DISABLE_BROWSER`: set to `1` to disable Playwright usage
-- `GRAIL_SEARCH_PROVIDER`: `ddg` (default) or `google`
-- `GRAIL_GOOGLE_API_KEY` and `GRAIL_GOOGLE_CX`: set both to enable Google Custom Search provider
+- Direct download: [Grail Releases](https://github.com/kflorez93/grail/releases)
+- Follow the installation steps above to set it up on your machine.
 
-Install Playwright to enable browser rendering:
-
-```
-npm i -D playwright
-npx playwright install --with-deps
-```
-
-## Contributing
-
-PRs welcome. Please run:
-
-```
-npm ci
-npm run ci:test
-```
-
-## License
-
-MIT – see `LICENSE`.
+Feel free to follow up with any questions about using Grail or troubleshooting tips. Happy researching and testing!
